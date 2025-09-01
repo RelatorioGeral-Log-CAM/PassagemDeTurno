@@ -81,8 +81,13 @@ export const getAvailableDates = (data: ArmazemEstojosData[]): string[] => {
     }
     return dateOnly;
   });
-  
-  const uniqueDates = Array.from(new Set(dates)).filter(date => date);
+
+  const uniqueDates = Array.from(new Set(dates)).filter(date => {
+    // Adiciona uma verificação para garantir que a string é uma data válida
+    const dateObject = new Date(date);
+    return date && !isNaN(dateObject.getTime());
+  });
+
   return uniqueDates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 };
 
