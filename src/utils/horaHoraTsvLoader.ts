@@ -32,10 +32,9 @@ export interface HoraHoraData {
   total2T: number;
 }
 
-export const loadRecebimentoMeData = async (): Promise<HoraHoraData[]> => {
+export const loadHoraHoraData = async (): Promise<HoraHoraData[]> => {
   try {
-    // CORREÇÃO APLICADA AQUI: Adicionando import.meta.env.BASE_URL
-    const response = await fetch(`${import.meta.env.BASE_URL}expedicao-hora-hora-data.tsv`);
+    const response = await fetch (`${import.meta.env.BASE_URL}expedicao-hora-hora-data.tsv`)
     if (!response.ok) {
       throw new Error('Failed to load TSV data');
     }

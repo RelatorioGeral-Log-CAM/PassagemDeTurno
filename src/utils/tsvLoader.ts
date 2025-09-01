@@ -19,7 +19,7 @@ export interface SeparacaoData {
 
 export const loadSeparacaoData = async (): Promise<SeparacaoData[]> => {
   try {
-    const response = await fetch('/separacao-data.tsv');
+    const response = await fetch (`${import.meta.env.BASE_URL}separacao-data.tsv`)
     if (!response.ok) {
       throw new Error('Failed to load TSV data');
     }
