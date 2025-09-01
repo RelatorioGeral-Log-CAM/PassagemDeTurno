@@ -15,7 +15,7 @@ export interface ExpedicaoData {
   responsavel: string;
 }
 
-export const loadRecebimentoMeData = async (): Promise<ExpedicaoData[]> => {
+export const loadExpedicaoData = async (): Promise<ExpedicaoData[]> => {
   try {
     // CORREÇÃO APLICADA AQUI: Adicionando import.meta.env.BASE_URL
     const response = await fetch (`${import.meta.env.BASE_URL}recebimento-me-data.tsv`)
