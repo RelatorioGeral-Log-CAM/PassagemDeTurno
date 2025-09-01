@@ -4,6 +4,8 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Adicione esta linha com o nome do seu repositório
+  base: '/PassagemDeTurno/', 
   server: {
     host: "::",
     port: 8080,
