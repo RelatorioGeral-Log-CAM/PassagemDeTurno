@@ -302,6 +302,31 @@ export const Dashboard = () => {
               gradient="accent"
               className="col-span-1"
             />
+            <Card className="bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20 hover:shadow-glow transition-all duration-300">
+              <CardHeader className="pb-3">
+                <div className="flex items-center space-x-2">
+                  <div className="p-2 bg-gradient-to-r from-accent to-accent/80 rounded-lg">
+                    <BarChart3 className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-sm font-medium text-foreground">Análise Detalhada</CardTitle>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <Button 
+                  onClick={() => setShowHoraHora(true)}
+                  className="w-full bg-gradient-primary hover:bg-gradient-primary/90 text-white font-medium"
+                  size="sm"
+                >
+                  <Clock className="h-4 w-4 mr-2" />
+                  Visualizar Hora a Hora
+                </Button>
+                <p className="text-xs text-muted-foreground mt-2 text-center">
+                  Dashboard interativo
+                </p>
+              </CardContent>
+            </Card>
           </div>
           
           {/* Detalhes dos turnos de expedição */}
