@@ -27,7 +27,10 @@ export interface ArmazemEstojosData {
 
 export const loadArmazemEstojosData = async (): Promise<ArmazemEstojosData[]> => {
   try {
-    const response = await fetch('/armazem-estojos-data.tsv');
+    const response = await fetch(`${import.meta.env.BASE_URL}armazem-estojos-data.tsv`);
+        if (!response.ok) {
+      throw new Error('Failed to load TSV data');
+    }
     const text = await response.text();
     const lines = text.trim().split('\n');
     const headers = lines[0].split('\t');

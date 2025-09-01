@@ -15,9 +15,10 @@ export interface ExpedicaoData {
   responsavel: string;
 }
 
-export const loadExpedicaoData = async (): Promise<ExpedicaoData[]> => {
+export const loadRecebimentoMeData = async (): Promise<ExpedicaoData[]> => {
   try {
-    const response = await fetch('/expedicao-data.tsv');
+    // CORREÇÃO APLICADA AQUI: Adicionando import.meta.env.BASE_URL
+    const response = await fetch(`${import.meta.env.BASE_URL}expedicao-data.tsv`);
     if (!response.ok) {
       throw new Error('Failed to load TSV data');
     }

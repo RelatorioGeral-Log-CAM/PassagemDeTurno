@@ -40,7 +40,8 @@ export interface RecebimentoMeData {
 
 export const loadRecebimentoMeData = async (): Promise<RecebimentoMeData[]> => {
   try {
-    const response = await fetch('/recebimento-me-data.tsv');
+    // CORREÇÃO APLICADA AQUI: Adicionando import.meta.env.BASE_URL
+    const response = await fetch(`${import.meta.env.BASE_URL}recebimento-me-data.tsv`);
     if (!response.ok) {
       throw new Error('Failed to load TSV data');
     }

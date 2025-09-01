@@ -30,9 +30,10 @@ export interface MateriaPrimaData {
   observacoes: string;
 }
 
-export const loadMateriaPrimaData = async (): Promise<MateriaPrimaData[]> => {
+export const loadRecebimentoMeData = async (): Promise<MateriaPrimaData[]> => {
   try {
-    const response = await fetch('/materia-prima-data.tsv');
+    // CORREÇÃO APLICADA AQUI: Adicionando import.meta.env.BASE_URL
+    const response = await fetch(`${import.meta.env.BASE_URL}materia-prima-data.tsv`);
     if (!response.ok) {
       throw new Error('Failed to load TSV data');
     }
