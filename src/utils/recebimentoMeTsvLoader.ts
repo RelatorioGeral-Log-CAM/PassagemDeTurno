@@ -103,12 +103,6 @@ export const getAvailableRecebimentoMeDates = (data: RecebimentoMeData[]): strin
       .filter(item => item.data && item.data.trim() !== '')
       .map(item => {
         const dateOnly = item.data.split(' ')[0];
-        
-        // Verifique se a data já está no formato YYYY-MM-DD
-        if (/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
-          return dateOnly; // Não precisa converter
-        }
-        
         // Converter de DD/MM/YYYY para YYYY-MM-DD se necessário
         if (dateOnly.includes('/')) {
           const parts = dateOnly.split('/');
