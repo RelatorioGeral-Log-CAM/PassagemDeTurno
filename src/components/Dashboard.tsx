@@ -5,12 +5,14 @@ import { KPICard } from "./KPICard";
 import { HoraHoraDashboard } from "./HoraHoraDashboard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { loadSeparacaoData, getAvailableDates, getKPISummarySeparacao, type SeparacaoData } from "@/utils/tsvLoader";
+import { loadSeparacaoData, getAvailableDates, getKPISummarySeparacao, getTempoSemPNP, type SeparacaoData } from "@/utils/tsvLoader";
 import { loadMateriaPrimaData, getAvailableMateriaPrimaDates, getKPISummaryMateriaPrima, type MateriaPrimaData } from "@/utils/materiaPrimaTsvLoader";
 import { loadExpedicaoData, getAvailableExpedicaoDates, getKPISummaryExpedicao, type ExpedicaoData } from "@/utils/expedicaoTsvLoader";
 import { loadRecebimentoMeData, getAvailableRecebimentoMeDates, getKPISummaryRecebimentoMe, type RecebimentoMeData } from "@/utils/recebimentoMeTsvLoader";
 import { loadArmazemEstojosData, getAvailableDates as getAvailableArmazemEstojosDates, getKPISummaryArmazemEstojos, type ArmazemEstojosData } from "@/utils/armazemEstojosTsvLoader";
 import { LinhasRodaramModal } from "./ArmazemEstojosKPIModals";
+import { PNPHistoricoModal } from "./PNPHistoricoModal";
+
 
 // Função para formatar datas brasileiras
 const formatBrazilianDate = (dateStr: string) => {
@@ -165,6 +167,9 @@ export const Dashboard = () => {
   const kpiRecebimentoMe = getKPISummaryRecebimentoMe(filteredRecebimentoMeData, selectedTurno);
   const kpiArmazemEstojos = getKPISummaryArmazemEstojos(filteredArmazemEstojosData, selectedTurno);
 
+  // Calcular tempo sem PNP usando todos os dados (não filtrados)
+    const tempoSemPnp = getTempoSemPNP(separacaoData);
+
   return (
     <div className="space-y-4 px-2 sm:px-0">
       {/* Header Section - Mobile Optimized */}
@@ -255,8 +260,51 @@ export const Dashboard = () => {
               ))}
             </div>
           </div>
+
+          {/* Tempo sem PNP por Fábrica */}
+          <div className="mt-4 space-y-2">
+            <h4 className="text-sm font-medium text-muted-foreground">Tempo sem PNP por Fábrica:</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <PNPHistoricoModal data={separacaoData} fabrica="cremes">
+                <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950/20 dark:to-green-900/20 rounded-lg p-3 border border-green-200 dark:border-green-800 transition-all hover:shadow-lg">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <p className="text-sm font-semibold text-green-700 dark:text-green-400">Fábrica de Cremes</p>
+                  </div>
+                  <p className="text-lg font-bold text-green-600 dark:text-green-400">{tempoSemPnp.cremes.status}</p>
+                  {tempoSemPnp.cremes.ultimoPnp && (
+                    <p className="text-xs text-green-600 dark:text-green-500 mt-1">
+                      Último PNP: {tempoSemPnp.cremes.ultimoPnp.toLocaleString('pt-BR')}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-2 opacity-70">
+                    Clique para ver histórico completo
+                  </p>
+                </div>
+              </PNPHistoricoModal>
+              
+              <PNPHistoricoModal data={separacaoData} fabrica="hidro">
+                <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800 transition-all hover:shadow-lg">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <p className="text-sm font-semibold text-blue-700 dark:text-blue-400">Fábrica de Hidro</p>
+                  </div>
+                  <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{tempoSemPnp.hidro.status}</p>
+                  {tempoSemPnp.hidro.ultimoPnp && (
+                    <p className="text-xs text-blue-600 dark:text-blue-500 mt-1">
+                      Último PNP: {tempoSemPnp.hidro.ultimoPnp.toLocaleString('pt-BR')}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-2 opacity-70">
+                    Clique para ver histórico completo
+                  </p>
+                </div>
+              </PNPHistoricoModal>
+            </div>
+          </div>
         </div>
       )}
+
 
       {/* Expedição KPIs */}
       {filteredExpedicaoData.length > 0 && (

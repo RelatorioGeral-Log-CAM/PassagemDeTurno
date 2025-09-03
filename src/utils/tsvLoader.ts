@@ -75,6 +75,77 @@ export const getTurnos = (): string[] => {
   return ['TURNO 1', 'TURNO 2', 'TURNO 3'];
 };
 
+// Função para calcular tempo sem PNP
+export const getTempoSemPNP = (allData: SeparacaoData[]) => {
+  // Ordenar dados por data/hora (mais recente primeiro)
+  const sortedData = allData.slice().sort((a, b) => {
+    const dateA = new Date(a.dataHora.split(' ')[0].split('/').reverse().join('-') + ' ' + (a.dataHora.split(' ')[1] || '00:00:00'));
+    const dateB = new Date(b.dataHora.split(' ')[0].split('/').reverse().join('-') + ' ' + (b.dataHora.split(' ')[1] || '00:00:00'));
+    return dateB.getTime() - dateA.getTime();
+  });
+
+  let ultimoPnpCremes: Date | null = null;
+  let ultimoPnpHidro: Date | null = null;
+
+  // Procurar o último PNP em cada fábrica
+  for (const item of sortedData) {
+    if (item.pnp === 'Reportar PNP') {
+      // Verificar se é PNP de Cremes ou Hidro baseado na linha nos detalhes
+      const linhaMatch = item.detalhesPnp.match(/Linha:\s*(Cremes\s+([CH]\d+)|Hidro\s+([CH]\d+)|([CH]\d+))/i);
+      if (linhaMatch) {
+        let linha = '';
+        if (linhaMatch[2]) {
+          // Formato "Linha: Cremes C7"
+          linha = linhaMatch[2].toUpperCase();
+        } else if (linhaMatch[3]) {
+          // Formato "Linha: Hidro H1"
+          linha = linhaMatch[3].toUpperCase();
+        } else if (linhaMatch[4]) {
+          // Formato "Linha: C7" ou "Linha: H1"
+          linha = linhaMatch[4].toUpperCase();
+        }
+        
+        if (linha) {
+          const itemDate = new Date(item.dataHora.split(' ')[0].split('/').reverse().join('-') + ' ' + (item.dataHora.split(' ')[1] || '00:00:00'));
+          
+          if (linha.startsWith('C') && !ultimoPnpCremes) {
+            // É linha de Cremes (C1-C13)
+            ultimoPnpCremes = itemDate;
+          } else if (linha.startsWith('H') && !ultimoPnpHidro) {
+            // É linha de Hidro (H1-H9)
+            ultimoPnpHidro = itemDate;
+          }
+        }
+      }
+    }
+  }
+
+  const agora = new Date();
+  
+  // Calcular tempo sem PNP em horas
+  const tempoSemPnpCremes = ultimoPnpCremes 
+    ? Math.floor((agora.getTime() - ultimoPnpCremes.getTime()) / (1000 * 60 * 60))
+    : null;
+  
+  const tempoSemPnpHidro = ultimoPnpHidro 
+    ? Math.floor((agora.getTime() - ultimoPnpHidro.getTime()) / (1000 * 60 * 60))
+    : null;
+
+  return {
+    cremes: {
+      tempoHoras: tempoSemPnpCremes,
+      ultimoPnp: ultimoPnpCremes,
+      status: tempoSemPnpCremes === null ? 'Sem histórico de PNP' : `${tempoSemPnpCremes}h sem PNP`
+    },
+    hidro: {
+      tempoHoras: tempoSemPnpHidro,
+      ultimoPnp: ultimoPnpHidro,
+      status: tempoSemPnpHidro === null ? 'Sem histórico de PNP' : `${tempoSemPnpHidro}h sem PNP`
+    }
+  };
+};
+
+
 export const getKPISummarySeparacao = (data: SeparacaoData[], selectedTurno?: string) => {
   const filteredData = selectedTurno === 'todos' 
     ? data 
