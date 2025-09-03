@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Activity, Sparkles, TrendingUp, Package, Users, Truck, Clock, BarChart3, Warehouse, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Activity, Sparkles, TrendingUp, Package, Users, Truck, Clock, BarChart3, Warehouse, CheckCircle2, AlertTriangle, FileText, Layers, Timer } from "lucide-react";
 import { FiltroGeral } from "./FiltroGeral";
 import { KPICard } from "./KPICard";
 import { HoraHoraDashboard } from "./HoraHoraDashboard";
@@ -12,7 +12,6 @@ import { loadRecebimentoMeData, getAvailableRecebimentoMeDates, getKPISummaryRec
 import { loadArmazemEstojosData, getAvailableDates as getAvailableArmazemEstojosDates, getKPISummaryArmazemEstojos, type ArmazemEstojosData } from "@/utils/armazemEstojosTsvLoader";
 import { LinhasRodaramModal } from "./ArmazemEstojosKPIModals";
 import { PNPHistoricoModal } from "./PNPHistoricoModal";
-
 
 // Função para formatar datas brasileiras
 const formatBrazilianDate = (dateStr: string) => {
@@ -166,9 +165,9 @@ export const Dashboard = () => {
   const kpiExpedicao = getKPISummaryExpedicao(filteredExpedicaoData, selectedTurno);
   const kpiRecebimentoMe = getKPISummaryRecebimentoMe(filteredRecebimentoMeData, selectedTurno);
   const kpiArmazemEstojos = getKPISummaryArmazemEstojos(filteredArmazemEstojosData, selectedTurno);
-
+  
   // Calcular tempo sem PNP usando todos os dados (não filtrados)
-    const tempoSemPnp = getTempoSemPNP(separacaoData);
+  const tempoSemPnp = getTempoSemPNP(separacaoData);
 
   return (
     <div className="space-y-4 px-2 sm:px-0">
@@ -305,7 +304,6 @@ export const Dashboard = () => {
         </div>
       )}
 
-
       {/* Expedição KPIs */}
       {filteredExpedicaoData.length > 0 && (
         <div className="bg-gradient-to-br from-card to-card/80 rounded-xl p-3 sm:p-6 border shadow-card animate-slide-up border-accent/20">
@@ -427,23 +425,80 @@ export const Dashboard = () => {
             <Users className="h-4 w-4 sm:h-5 sm:w-5 text-secondary" />
           </div>
           
-          <div className="grid grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4">
-            <KPICard
-              title="Agendadas"
-              value={kpiMateriaPrima.totalAgendadas}
-              subtitle="Entregas do dia"
-              icon={Package}
-              gradient="primary"
-              className="col-span-1"
-            />
-            <KPICard
-              title="Recebidas"
-              value={kpiMateriaPrima.totalRecebidas}
-              subtitle="Processadas"
-              icon={CheckCircle2}
-              gradient="secondary"
-              className="col-span-1"
-            />
+          {/* Recebimento */}
+          <div className="mb-4">
+            <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              Recebimento
+            </h4>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <KPICard
+                title="Agendadas"
+                value={kpiMateriaPrima.totalAgendadas}
+                subtitle="Entregas do dia"
+                icon={Package}
+                gradient="primary"
+                className="col-span-1"
+              />
+              <KPICard
+                title="Recebidas"
+                value={kpiMateriaPrima.totalRecebidas}
+                subtitle="Processadas"
+                icon={CheckCircle2}
+                gradient="secondary"
+                className="col-span-1"
+              />
+              <KPICard
+                title="NFs Recebidas"
+                value={kpiMateriaPrima.totalNfRecebidas}
+                subtitle="Notas fiscais"
+                icon={FileText}
+                gradient="accent"
+                className="col-span-1"
+              />
+              <KPICard
+                title="Lançadas"
+                value={kpiMateriaPrima.totalLancadas}
+                subtitle="Itens lançados"
+                icon={TrendingUp}
+                gradient="primary"
+                className="col-span-1"
+              />
+            </div>
+          </div>
+
+          {/* Waves */}
+          <div className="mb-4">
+            <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+              <Layers className="h-4 w-4" />
+              Waves
+            </h4>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
+              <KPICard
+                title="Wave Separação"
+                value={kpiMateriaPrima.totalWaveSeparacao}
+                subtitle="Em processo"
+                icon={Activity}
+                gradient="primary"
+                className="col-span-1"
+              />
+              <KPICard
+                title="Wave Pesagem"
+                value={kpiMateriaPrima.totalWavePesagem}
+                subtitle="Sendo pesadas"
+                icon={BarChart3}
+                gradient="secondary"
+                className="col-span-1"
+              />
+              <KPICard
+                title="Wave Fila"
+                value={kpiMateriaPrima.totalWaveFila}
+                subtitle="Aguardando"
+                icon={Timer}
+                gradient="accent"
+                className="col-span-1"
+              />
+            </div>
           </div>
           
           {/* Detalhes por Turno - Matéria Prima */}

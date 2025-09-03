@@ -150,6 +150,20 @@ export const getKPISummaryMateriaPrima = (data: MateriaPrimaData[], selectedTurn
   const qualidadeAtendidos = filteredData.reduce((acc, item) => 
     acc + (parseInt(item.qualidadeAtendidos) || 0), 0);
 
+  // Adicionar dados das NFs Recebidas
+  const totalNfRecebidas = filteredData.reduce((acc, item) => 
+    acc + (parseInt(item.recebidas2) || 0), 0);
+
+  // Adicionar dados das Waves
+  const totalWaveSeparacao = filteredData.reduce((acc, item) => 
+    acc + (parseInt(item.waveSeparacao) || 0), 0);
+
+  const totalWavePesagem = filteredData.reduce((acc, item) => 
+    acc + (parseInt(item.wavePesagem) || 0), 0);
+
+  const totalWaveFila = filteredData.reduce((acc, item) => 
+    acc + (parseInt(item.waveFila) || 0), 0);
+
   const turnosAtivos = filteredData.length;
 
   return {
@@ -159,6 +173,10 @@ export const getKPISummaryMateriaPrima = (data: MateriaPrimaData[], selectedTurn
     totalLancadas,
     totalPendentes,
     totalNfPendentes,
+    totalNfRecebidas,
+    totalWaveSeparacao,
+    totalWavePesagem,
+    totalWaveFila,
     qualidadeSolicitados,
     qualidadeAtendidos,
     turnosAtivos,

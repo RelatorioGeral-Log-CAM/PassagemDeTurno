@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FiltroGeral } from "./FiltroGeral";
 import { loadMateriaPrimaData, getAvailableMateriaPrimaDates, getKPISummaryMateriaPrima, type MateriaPrimaData } from "@/utils/materiaPrimaTsvLoader";
-import { Clock, Truck, Package, AlertCircle, CheckCircle2, Info, Users, BarChart3, TrendingUp, Activity } from "lucide-react";
+import { Clock, Truck, Package, AlertCircle, CheckCircle2, Info, Users, BarChart3, TrendingUp, Activity, FileText, Layers, Timer } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KPICard } from "./KPICard";
 
