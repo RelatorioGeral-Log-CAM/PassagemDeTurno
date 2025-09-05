@@ -32,7 +32,7 @@ export interface MateriaPrimaData {
 
 export const loadMateriaPrimaData = async (): Promise<MateriaPrimaData[]> => {
   try {
-    const response = await fetch (`${import.meta.env.BASE_URL}materia-prima-data.tsv`)
+    const response = await fetch(`${import.meta.env.BASE_URL}materia-prima-data.tsv`);
     if (!response.ok) {
       throw new Error('Failed to load TSV data');
     }
@@ -109,8 +109,8 @@ export const getKPISummaryMateriaPrima = (data: MateriaPrimaData[], selectedTurn
     ? data 
     : data.filter(item => item.turno === selectedTurno);
 
-  // Para agendadas/recebidas, pegar o primeiro valor do dia (não somar por turno)
-  // Agrupar por data
+  // Para agendadas: pegar apenas um número (primeiro valor encontrado do dia)
+  // Para recebidas: somar todos os valores
   const dataGroups = filteredData.reduce((acc, item) => {
     const dateOnly = item.dataHora.split(' ')[0];
     if (!acc[dateOnly]) {
@@ -120,15 +120,18 @@ export const getKPISummaryMateriaPrima = (data: MateriaPrimaData[], selectedTurn
     return acc;
   }, {} as Record<string, MateriaPrimaData[]>);
 
-  // Para cada dia, pegar o primeiro valor de agendadas e recebidas (não somar)
   let totalAgendadas = 0;
   let totalRecebidas = 0;
   
   Object.values(dataGroups).forEach(dayData => {
     if (dayData.length > 0) {
+      // Agendadas: apenas o primeiro valor do dia
       const firstEntry = dayData[0];
       totalAgendadas = parseInt(firstEntry.agendadas) || 0;
-      totalRecebidas = parseInt(firstEntry.recebidas) || 0;
+      
+      // Recebidas: somar todos os turnos
+      totalRecebidas += dayData.reduce((acc, item) => 
+        acc + (parseInt(item.recebidas) || 0), 0);
     }
   });
 
@@ -186,7 +189,14 @@ export const getKPISummaryMateriaPrima = (data: MateriaPrimaData[], selectedTurn
       agendadas: item.agendadas,
       recebidas: item.recebidas,
       qualidadeSolicitados: item.qualidadeSolicitados,
-      qualidadeAtendidos: item.qualidadeAtendidos
+      qualidadeAtendidos: item.qualidadeAtendidos,
+      waves: {
+        separacao: item.waveSeparacao,
+        pesagem: item.wavePesagem,
+        eclusa: item.waveEclusa,
+        separadas: item.wavesSeparadas,
+        fila: item.waveFila
+      }
     }))
   };
 };

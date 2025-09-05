@@ -142,7 +142,7 @@ export const HoraHoraInline = ({ selectedDate }: HoraHoraInlineProps) => {
         <div className="bg-gradient-to-r from-muted/20 to-muted/10 rounded-lg p-3 border border-border">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">Melhor Turno</p>
+              <p className="text-xs text-muted-foreground">+ Solicitados</p>
               <p className="text-lg font-bold text-foreground">{melhorTurno.turno}</p>
               <p className="text-xs text-muted-foreground">{melhorTurno.total} pallets</p>
             </div>

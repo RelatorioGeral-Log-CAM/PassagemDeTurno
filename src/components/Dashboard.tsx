@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Activity, Sparkles, TrendingUp, Package, Users, Truck, Clock, BarChart3, Warehouse, CheckCircle2, AlertTriangle, FileText, Layers, Timer } from "lucide-react";
+import { Activity, Sparkles, TrendingUp, Package, Users, Truck, Clock, BarChart3, Warehouse, CheckCircle2, AlertTriangle, FileText, Layers, Timer, ExternalLink } from "lucide-react";
 import { FiltroGeral } from "./FiltroGeral";
 import { KPICard } from "./KPICard";
 import { HoraHoraDashboard } from "./HoraHoraDashboard";
@@ -13,6 +13,7 @@ import { loadRecebimentoMeData, getAvailableRecebimentoMeDates, getKPISummaryRec
 import { loadArmazemEstojosData, getAvailableDates as getAvailableArmazemEstojosDates, getKPISummaryArmazemEstojos, type ArmazemEstojosData } from "@/utils/armazemEstojosTsvLoader";
 import { LinhasRodaramModal } from "./ArmazemEstojosKPIModals";
 import { PNPHistoricoModal } from "./PNPHistoricoModal";
+import { WebsiteModal } from "./WebsiteModal";
 
 // Função para formatar datas brasileiras
 const formatBrazilianDate = (dateStr: string) => {
@@ -162,7 +163,7 @@ export const Dashboard = () => {
 
   const kpiSeparacao = getKPISummarySeparacao(filteredSeparacaoData, selectedTurno);
   const kpiMateriaPrima = getKPISummaryMateriaPrima(filteredMateriaPrimaData, selectedTurno);
-  const kpiExpedicao = getKPISummaryExpedicao(filteredExpedicaoData, selectedTurno);
+  const kpiExpedicao = getKPISummaryExpedicao(filteredExpedicaoData, selectedTurno, selectedDate);
   const kpiRecebimentoMe = getKPISummaryRecebimentoMe(filteredRecebimentoMeData, selectedTurno);
   const kpiArmazemEstojos = getKPISummaryArmazemEstojos(filteredArmazemEstojosData, selectedTurno);
   
@@ -211,7 +212,7 @@ export const Dashboard = () => {
             <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           </div>
           
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <KPICard
               title="Total Linhas"
               value={kpiSeparacao.totalLinhas}
@@ -236,6 +237,20 @@ export const Dashboard = () => {
               gradient={kpiSeparacao.temPnp ? "accent" : "primary"}
               className="col-span-1"
             />
+            <WebsiteModal
+              url="https://www.youtube.com"
+              title="Sistema de Contagem"
+              buttonText="Visualizar contagem"
+            >
+              <KPICard
+                title="Sistema"
+                value="Externo"
+                subtitle="Visualizar contagem"
+                icon={ExternalLink}
+                gradient="secondary"
+                className="col-span-1 cursor-pointer"
+              />
+            </WebsiteModal>
           </div>
           
           {/* Detalhes por Turno - Separação */}
@@ -323,7 +338,15 @@ export const Dashboard = () => {
             <Truck className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           </div>
           
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4">
+            <KPICard
+              title="Total Programado"
+              value={kpiExpedicao.totalProgramado}
+              subtitle="Pallets programados"
+              icon={FileText}
+              gradient="accent"
+              className="col-span-1"
+            />
             <KPICard
               title="Total Pallets"
               value={kpiExpedicao.totalPallets}
@@ -344,14 +367,6 @@ export const Dashboard = () => {
               title="Média Pallets/Turno"
               value={kpiExpedicao.avgPalletsPorTurno}
               subtitle="Por turno ativo"
-              icon={TrendingUp}
-              gradient="accent"
-              className="col-span-1"
-            />
-            <KPICard
-              title="Eficiência"
-              value={`${kpiExpedicao.eficiencia}%`}
-              subtitle="Meta por turno"
               icon={TrendingUp}
               gradient="accent"
               className="col-span-1"
@@ -453,54 +468,126 @@ export const Dashboard = () => {
             </div>
           </div>
 
-          {/* Waves */}
+          {/* Waves por Turno */}
           <div className="mb-4">
             <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
               <Layers className="h-4 w-4" />
-              Waves
+              Waves por Turno
             </h4>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
-              <KPICard
-                title="Wave Separação"
-                value={kpiMateriaPrima.totalWaveSeparacao}
-                subtitle="Em processo"
-                icon={Activity}
-                gradient="primary"
-                className="col-span-1"
-              />
-              <KPICard
-                title="Wave Pesagem"
-                value={kpiMateriaPrima.totalWavePesagem}
-                subtitle="Sendo pesadas"
-                icon={BarChart3}
-                gradient="secondary"
-                className="col-span-1"
-              />
-              <KPICard
-                title="Wave Fila"
-                value={kpiMateriaPrima.totalWaveFila}
-                subtitle="Aguardando"
-                icon={Timer}
-                gradient="accent"
-                className="col-span-1"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-4 border border-primary/20 shadow-card hover:shadow-modern transition-all duration-300">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-gradient-primary rounded-lg">
+                      <Package className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h5 className="font-semibold text-foreground">Separação</h5>
+                      <p className="text-xs text-muted-foreground">Waves em processo</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-primary">
+                      {kpiMateriaPrima.dataByTurno.reduce((acc, turno) => acc + parseInt(turno.waves?.separacao || '0'), 0)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Total</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {kpiMateriaPrima.dataByTurno.map((turno, idx) => (
+                    <div key={idx} className="flex justify-between items-center bg-primary/5 rounded-md px-3 py-1">
+                      <span className="text-xs font-medium text-muted-foreground">{turno.turno}</span>
+                      <span className="text-sm font-bold text-primary">{turno.waves?.separacao || '0'}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 rounded-xl p-4 border border-secondary/20 shadow-card hover:shadow-modern transition-all duration-300">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-gradient-secondary rounded-lg">
+                      <BarChart3 className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h5 className="font-semibold text-foreground">Pesagem</h5>
+                      <p className="text-xs text-muted-foreground">Waves em pesagem</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-secondary">
+                      {kpiMateriaPrima.dataByTurno.reduce((acc, turno) => acc + parseInt(turno.waves?.pesagem || '0'), 0)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Total</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {kpiMateriaPrima.dataByTurno.map((turno, idx) => (
+                    <div key={idx} className="flex justify-between items-center bg-secondary/5 rounded-md px-3 py-1">
+                      <span className="text-xs font-medium text-muted-foreground">{turno.turno}</span>
+                      <span className="text-sm font-bold text-secondary">{turno.waves?.pesagem || '0'}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-xl p-4 border border-accent/20 shadow-card hover:shadow-modern transition-all duration-300">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-gradient-accent rounded-lg">
+                      <Clock className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h5 className="font-semibold text-foreground">Fila</h5>
+                      <p className="text-xs text-muted-foreground">Waves aguardando</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-accent">
+                      {kpiMateriaPrima.dataByTurno.reduce((acc, turno) => acc + parseInt(turno.waves?.fila || '0'), 0)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Total</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {kpiMateriaPrima.dataByTurno.map((turno, idx) => (
+                    <div key={idx} className="flex justify-between items-center bg-accent/5 rounded-md px-3 py-1">
+                      <span className="text-xs font-medium text-muted-foreground">{turno.turno}</span>
+                      <span className="text-sm font-bold text-accent">{turno.waves?.fila || '0'}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-          
+
           {/* Detalhes por Turno - Matéria Prima */}
           <div className="mt-4 space-y-2">
-            <h4 className="text-sm font-medium text-muted-foreground">Detalhes por Turno:</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <h4 className="text-base font-medium text-muted-foreground">Detalhes por Turno:</h4>
+            <div className="grid grid-cols-1 gap-3">
               {kpiMateriaPrima.dataByTurno.map((turno, index) => (
-                <div key={index} className="bg-gradient-to-r from-primary/10 to-secondary/20 rounded-lg p-2 border border-primary/20">
-                  <p className="text-xs font-medium text-muted-foreground">{turno.turno}</p>
-                  <div className="flex justify-between text-xs">
-                    <span>Agendadas: <strong>{turno.agendadas}</strong></span>
-                    <span>Recebidas: <strong>{turno.recebidas}</strong></span>
+                <div key={index} className="bg-gradient-to-r from-secondary/10 to-accent/20 rounded-lg p-4 border border-secondary/20">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-base font-semibold text-foreground">{turno.turno}</p>
+                    <p className="text-sm text-muted-foreground">{turno.dataHora}</p>
                   </div>
-                  <div className="flex justify-between text-xs mt-1">
-                    <span>Qual.Solic: <strong>{turno.qualidadeSolicitados}</strong></span>
-                    <span>Qual.Atend: <strong>{turno.qualidadeAtendidos}</strong></span>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Agendadas: </span>
+                      <strong className="text-primary text-base">{turno.agendadas}</strong>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Recebidas: </span>
+                      <strong className="text-secondary text-base">{turno.recebidas}</strong>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Qualidade Sol.: </span>
+                      <strong className="text-accent text-base">{turno.qualidadeSolicitados}</strong>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Qualidade Atend.: </span>
+                      <strong className="text-primary text-base">{turno.qualidadeAtendidos}</strong>
+                    </div>
                   </div>
                 </div>
               ))}

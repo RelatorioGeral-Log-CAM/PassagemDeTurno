@@ -2,6 +2,7 @@ export interface ExpedicaoData {
   turno: string;
   dataHora: string;
   palletsExpedidos: string;
+  programados: string;
   totalCargas: string;
   emDescida: string;
   zonaMista: string;
@@ -17,8 +18,7 @@ export interface ExpedicaoData {
 
 export const loadExpedicaoData = async (): Promise<ExpedicaoData[]> => {
   try {
-    // CORREÇÃO APLICADA AQUI: Adicionando import.meta.env.BASE_URL
-    const response = await fetch (`${import.meta.env.BASE_URL}expedicao-data.tsv`)
+    const response = await fetch('/expedicao-data.tsv');
     if (!response.ok) {
       throw new Error('Failed to load TSV data');
     }
@@ -33,17 +33,18 @@ export const loadExpedicaoData = async (): Promise<ExpedicaoData[]> => {
         turno: values[0] || '',
         dataHora: values[1] || '',
         palletsExpedidos: values[2] || '',
-        totalCargas: values[3] || '',
-        emDescida: values[4] || '',
-        zonaMista: values[5] || '',
-        pisoNovoArmazem: values[6] || '',
-        fifo1: values[7] || '',
-        fifo2: values[8] || '',
-        fifo3: values[9] || '',
-        fifo4: values[10] || '',
-        fifo5: values[11] || '',
-        observacao: values[12] || '',
-        responsavel: values[13] || ''
+        programados: values[3] || '',
+        totalCargas: values[4] || '',
+        emDescida: values[5] || '',
+        zonaMista: values[6] || '',
+        pisoNovoArmazem: values[7] || '',
+        fifo1: values[8] || '',
+        fifo2: values[9] || '',
+        fifo3: values[10] || '',
+        fifo4: values[11] || '',
+        fifo5: values[12] || '',
+        observacao: values[13] || '',
+        responsavel: values[14] || ''
       };
     });
   } catch (error) {
@@ -72,7 +73,7 @@ export const getExpedicaoTurnos = (): string[] => {
   return ['TURNO 1', 'TURNO 2', 'TURNO 3'];
 };
 
-export const getKPISummaryExpedicao = (data: ExpedicaoData[], turnoFilter: string = 'todos') => {
+export const getKPISummaryExpedicao = (data: ExpedicaoData[], turnoFilter: string = 'todos', selectedDate?: string) => {
   const filteredData = turnoFilter === 'todos' 
     ? data 
     : data.filter(item => item.turno === turnoFilter);
@@ -82,6 +83,37 @@ export const getKPISummaryExpedicao = (data: ExpedicaoData[], turnoFilter: strin
     const pallets = parseInt(item.palletsExpedidos.split('/')[0] || '0');
     return acc + pallets;
   }, 0);
+
+  // Lógica para pallets programados: mostrar do dia anterior
+  let totalProgramado = 0;
+  if (selectedDate) {
+    // Calcular data anterior
+    const currentDate = new Date(selectedDate);
+    const previousDate = new Date(currentDate);
+    previousDate.setDate(currentDate.getDate() - 1);
+    const previousDateStr = previousDate.toISOString().split('T')[0];
+    
+    // Filtrar dados do dia anterior para programados
+    const previousDayData = data.filter(item => {
+      const dateOnly = item.dataHora.split(' ')[0];
+      let itemDate = dateOnly;
+      if (dateOnly.includes('/')) {
+        const parts = dateOnly.split('/');
+        if (parts.length === 3) {
+          itemDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+      }
+      return itemDate === previousDateStr;
+    });
+    
+    totalProgramado = previousDayData.reduce((acc, item) => {
+      return acc + parseInt(item.programados || '0');
+    }, 0);
+  } else {
+    totalProgramado = filteredData.reduce((acc, item) => {
+      return acc + parseInt(item.programados || '0');
+    }, 0);
+  }
 
   const totalCargas = filteredData.reduce((acc, item) => {
     return acc + parseInt(item.totalCargas || '0');
@@ -94,6 +126,7 @@ export const getKPISummaryExpedicao = (data: ExpedicaoData[], turnoFilter: strin
 
   return {
     totalPallets,
+    totalProgramado,
     totalCargas,
     avgPalletsPorTurno,
     avgCargasPorTurno,
