@@ -122,7 +122,7 @@ export const getTempoSemPNP = (allData: SeparacaoData[]) => {
 
   const agora = new Date();
   
-  // Calcular tempo sem PNP em horas
+  // Calcular tempo sem PNP em horas e dias
   const tempoSemPnpCremes = ultimoPnpCremes 
     ? Math.floor((agora.getTime() - ultimoPnpCremes.getTime()) / (1000 * 60 * 60))
     : null;
@@ -131,16 +131,28 @@ export const getTempoSemPNP = (allData: SeparacaoData[]) => {
     ? Math.floor((agora.getTime() - ultimoPnpHidro.getTime()) / (1000 * 60 * 60))
     : null;
 
+      const formatarTempo = (horas: number | null) => {
+    if (horas === null) return 'Sem histórico de PNP';
+    const dias = Math.floor(horas / 24);
+    const horasRestantes = horas % 24;
+    
+    if (dias > 0) {
+      return `${dias}d ${horasRestantes}h sem PNP`;
+    } else {
+      return `${horasRestantes}h sem PNP`;
+    }
+  };
+
   return {
     cremes: {
       tempoHoras: tempoSemPnpCremes,
       ultimoPnp: ultimoPnpCremes,
-      status: tempoSemPnpCremes === null ? 'Sem histórico de PNP' : `${tempoSemPnpCremes}h sem PNP`
+      status: formatarTempo(tempoSemPnpCremes)
     },
     hidro: {
       tempoHoras: tempoSemPnpHidro,
       ultimoPnp: ultimoPnpHidro,
-      status: tempoSemPnpHidro === null ? 'Sem histórico de PNP' : `${tempoSemPnpHidro}h sem PNP`
+      status: formatarTempo(tempoSemPnpHidro)
     }
   };
 };
