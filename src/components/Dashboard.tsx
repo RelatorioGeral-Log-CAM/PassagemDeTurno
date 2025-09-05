@@ -3,6 +3,7 @@ import { Activity, Sparkles, TrendingUp, Package, Users, Truck, Clock, BarChart3
 import { FiltroGeral } from "./FiltroGeral";
 import { KPICard } from "./KPICard";
 import { HoraHoraDashboard } from "./HoraHoraDashboard";
+import { HoraHoraInline } from "./HoraHoraInline";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { loadSeparacaoData, getAvailableDates, getKPISummarySeparacao, getTempoSemPNP, type SeparacaoData } from "@/utils/tsvLoader";
@@ -31,7 +32,6 @@ export const Dashboard = () => {
   const [recebimentoMeData, setRecebimentoMeData] = useState<RecebimentoMeData[]>([]);
   const [armazemEstojosData, setArmazemEstojosData] = useState<ArmazemEstojosData[]>([]);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
-  const [showHoraHora, setShowHoraHora] = useState(false);
   const [expandedMateriaPrima, setExpandedMateriaPrima] = useState<{[key: string]: boolean}>({});
   const [expandedExpedicao, setExpandedExpedicao] = useState<{[key: string]: boolean}>({});
 
@@ -348,31 +348,14 @@ export const Dashboard = () => {
               gradient="accent"
               className="col-span-1"
             />
-            <Card className="bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20 hover:shadow-glow transition-all duration-300">
-              <CardHeader className="pb-3">
-                <div className="flex items-center space-x-2">
-                  <div className="p-2 bg-gradient-to-r from-accent to-accent/80 rounded-lg">
-                    <BarChart3 className="h-4 w-4 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-sm font-medium text-foreground">Análise Detalhada</CardTitle>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <Button 
-                  onClick={() => setShowHoraHora(true)}
-                  className="w-full bg-gradient-primary hover:bg-gradient-primary/90 text-white font-medium"
-                  size="sm"
-                >
-                  <Clock className="h-4 w-4 mr-2" />
-                  Visualizar Hora a Hora
-                </Button>
-                <p className="text-xs text-muted-foreground mt-2 text-center">
-                  Dashboard interativo
-                </p>
-              </CardContent>
-            </Card>
+            <KPICard
+              title="Eficiência"
+              value={`${kpiExpedicao.eficiencia}%`}
+              subtitle="Meta por turno"
+              icon={TrendingUp}
+              gradient="accent"
+              className="col-span-1"
+            />
           </div>
           
           {/* Detalhes dos turnos de expedição */}
@@ -403,6 +386,9 @@ export const Dashboard = () => {
               ))}
             </div>
           </div>
+          
+          {/* Análise Hora a Hora */}
+          <HoraHoraInline selectedDate={selectedDate} />
         </div>
       )}
 
@@ -718,12 +704,6 @@ export const Dashboard = () => {
         </div>
       )}
 
-      {/* Dashboard Hora a Hora */}
-      <HoraHoraDashboard 
-        isOpen={showHoraHora}
-        onClose={() => setShowHoraHora(false)}
-        selectedDate={selectedDate}
-      />
     </div>
   );
 };
