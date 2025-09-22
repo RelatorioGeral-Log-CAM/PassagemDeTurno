@@ -1,6 +1,7 @@
 import { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { forwardRef } from "react";
 
 interface KPICardProps {
   title: string;
@@ -13,17 +14,19 @@ interface KPICardProps {
   };
   gradient?: 'primary' | 'secondary' | 'accent';
   className?: string;
+  onClick?: () => void;
 }
 
-export const KPICard = ({ 
+export const KPICard = forwardRef<HTMLDivElement, KPICardProps>(({ 
   title, 
   value, 
   subtitle, 
   icon: Icon, 
   trend, 
   gradient = 'primary',
-  className 
-}: KPICardProps) => {
+  className,
+  onClick 
+}, ref) => {
   const gradientClasses = {
     primary: 'bg-gradient-primary',
     secondary: 'bg-gradient-secondary',
@@ -31,10 +34,15 @@ export const KPICard = ({
   };
 
   return (
-    <Card className={cn(
-      "relative overflow-hidden shadow-card hover:shadow-modern transition-all duration-300 hover:-translate-y-1 animate-slide-up group",
-      className
-    )}>
+    <Card 
+      ref={ref} 
+      className={cn(
+        "relative overflow-hidden shadow-card hover:shadow-modern transition-all duration-300 hover:-translate-y-1 animate-slide-up group",
+        onClick && "cursor-pointer",
+        className
+      )}
+      onClick={onClick}
+    >
       <div className={cn(
         "absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity",
         gradientClasses[gradient]
@@ -81,4 +89,6 @@ export const KPICard = ({
       </CardContent>
     </Card>
   );
-};
+});
+
+KPICard.displayName = "KPICard";

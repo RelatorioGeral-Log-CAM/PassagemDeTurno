@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, TrendingUp, Activity, Package } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar, LabelList } from "recharts";
 import { loadHoraHoraData, getHoraHoraByDate, getHourlyDataForChart, type HoraHoraData } from "@/utils/horaHoraTsvLoader";
 
 interface HoraHoraInlineProps {
@@ -142,7 +142,7 @@ export const HoraHoraInline = ({ selectedDate }: HoraHoraInlineProps) => {
         <div className="bg-gradient-to-r from-muted/20 to-muted/10 rounded-lg p-3 border border-border">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">+ Solicitados</p>
+              <p className="text-xs text-muted-foreground">Melhor Turno</p>
               <p className="text-lg font-bold text-foreground">{melhorTurno.turno}</p>
               <p className="text-xs text-muted-foreground">{melhorTurno.total} pallets</p>
             </div>
@@ -189,7 +189,7 @@ export const HoraHoraInline = ({ selectedDate }: HoraHoraInlineProps) => {
 
         {/* Gráfico de Produção por Turno */}
         <Card className="border-border/50">
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-100">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Activity className="h-4 w-4" />
               Produção por Turno
@@ -210,7 +210,13 @@ export const HoraHoraInline = ({ selectedDate }: HoraHoraInlineProps) => {
                     dataKey="total" 
                     fill="hsl(var(--primary))"
                     radius={[4, 4, 0, 0]}
-                  />
+                  >
+                    <LabelList 
+                      dataKey="total" 
+                      position='outside'
+                      style={{ fontSize: '12px',fontWeight: '800', fill: 'hsl(var(--foreground))'}}
+                    />
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>

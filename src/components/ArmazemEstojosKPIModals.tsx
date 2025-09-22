@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Activity, Clock } from "lucide-react";
 import { type ArmazemEstojosData } from "@/utils/armazemEstojosTsvLoader";
@@ -17,44 +17,56 @@ export const LinhasRodaramModal = ({ data, children }: LinhasRodaramModalProps) 
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
-            Detalhes das Linhas que Rodaram
+            Detalhes das Linhas que Rodaram por Turno
           </DialogTitle>
+          <DialogDescription>
+            Visualize quantas linhas operaram em cada turno organizadas por período
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 max-h-96 overflow-y-auto">
-          {data.map((item, index) => (
-            <div key={index} className="border rounded-lg p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {item.turno}
-                </Badge>
-                <span className="text-sm text-muted-foreground">
-                  {item.dataHora.split(' ')[0]}
-                </span>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Linhas que rodaram:</span>
-                  <Badge variant="secondary" className="text-lg font-bold">
-                    {item.qtdLinhasRodaram}
+          {/* Agrupar por turno dinamicamente */}
+          {Array.from(new Set(data.map(item => item.turno))).sort().map(turno => {
+            const turnoData = data.filter(item => item.turno === turno);
+            if (turnoData.length === 0) return null;
+            
+            return (
+              <div key={turno} className="space-y-3">
+                <div className="flex items-center gap-2 pb-2 border-b">
+                  <Badge variant="default" className="text-sm font-semibold">
+                    {turno}
                   </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {turnoData.length} registro(s)
+                  </span>
                 </div>
                 
-                {item.linha && (
-                  <div className="text-sm text-muted-foreground">
-                    <span className="font-medium">Detalhes: </span>
-                    {item.linha}
+                {turnoData.map((item, index) => (
+                  <div key={index} className="ml-4 border-l-2 border-primary/20 pl-4 py-2 bg-muted/30 rounded-r-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-muted-foreground">
+                        {item.dataHora.split(' ')[0]}
+                      </span>
+                      <Badge variant="secondary" className="text-base font-bold">
+                        {item.qtdLinhasRodaram} linhas
+                      </Badge>
+                    </div>
+                    
+                    {item.linha && item.linha.trim() !== '' && item.linha.toLowerCase() !== 'n/a' && (
+                      <div className="text-sm">
+                        <span className="font-medium text-foreground">Detalhes: </span>
+                        <span className="text-muted-foreground">{item.linha}</span>
+                      </div>
+                    )}
                   </div>
-                )}
+                ))}
               </div>
-            </div>
-          ))}
+            );
+          })}
           
           {data.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">

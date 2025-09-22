@@ -27,9 +27,9 @@ export interface ArmazemEstojosData {
 
 export const loadArmazemEstojosData = async (): Promise<ArmazemEstojosData[]> => {
   try {
-    const response = await fetch (`${import.meta.env.BASE_URL}armazem-estojos-data.tsv`)
-    if (!response.ok){
-      throw new Error ("Falha ao carregar dados tsv")
+    const response = await fetch(`${import.meta.env.BASE_URL}armazem-estojos-data.tsv`);
+    if (!response.ok) {
+      throw new Error ("Falha ao carregar armazem-estojos-data.tsv ")
     }
     const text = await response.text();
     const lines = text.trim().split('\n');
@@ -81,13 +81,8 @@ export const getAvailableDates = (data: ArmazemEstojosData[]): string[] => {
     }
     return dateOnly;
   });
-
-  const uniqueDates = Array.from(new Set(dates)).filter(date => {
-    // Adiciona uma verificação para garantir que a string é uma data válida
-    const dateObject = new Date(date);
-    return date && !isNaN(dateObject.getTime());
-  });
-
+  
+  const uniqueDates = Array.from(new Set(dates)).filter(date => date);
   return uniqueDates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 };
 
@@ -116,5 +111,52 @@ export const getKPISummaryArmazemEstojos = (data: ArmazemEstojosData[], selected
     totalPalletsArmazenados,
     totalPalletsMovimentados,
     totalLinhasRodaram
+  };
+};
+
+export const getTempoSemPNPArmazemEstojos = (data: ArmazemEstojosData[]) => {
+  // Filtrar dados onde há PNP reportado (não vazio, não N/A, não "sem pnp")
+  const dadosComPnp = data.filter(item => 
+    item.reportarPNP && 
+    !item.reportarPNP.toLowerCase().includes('sem pnp') &&
+    !item.reportarPNP.toLowerCase().includes('n/a') &&
+    item.reportarPNP.trim() !== '' &&
+    item.reportarPNP.trim() !== '-'
+  );
+
+  let ultimoPnp: Date | null = null;
+  
+  if (dadosComPnp.length > 0) {
+    // Ordenar por data mais recente
+    const dadosOrdenados = dadosComPnp.sort((a, b) => {
+      const dateA = new Date(a.dataHora.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
+      const dateB = new Date(b.dataHora.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
+      return dateB.getTime() - dateA.getTime();
+    });
+    
+    const ultimoRegistro = dadosOrdenados[0];
+    ultimoPnp = new Date(ultimoRegistro.dataHora.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
+  }
+
+  const agora = new Date();
+  const tempoSemPnp = ultimoPnp ? agora.getTime() - ultimoPnp.getTime() : 0;
+  
+  // Converter para dias e horas
+  const diasSemPnp = Math.floor(tempoSemPnp / (1000 * 60 * 60 * 24));
+  const horasSemPnp = Math.floor((tempoSemPnp % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  
+  let statusText = 'Sem histórico de PNP';
+  if (ultimoPnp) {
+    if (diasSemPnp > 0) {
+      statusText = `${diasSemPnp}d ${horasSemPnp}h sem PNP`;
+    } else {
+      statusText = `${horasSemPnp}h sem PNP`;
+    }
+  }
+  
+  return {
+    status: statusText,
+    ultimoPnp,
+    horasSemPnp: Math.floor(tempoSemPnp / (1000 * 60 * 60))
   };
 };

@@ -51,7 +51,7 @@ export const Expedicao = () => {
     return matchesTurno && matchesDate;
   });
 
-  const kpiData = getKPISummaryExpedicao(filteredData, selectedTurno);
+  const kpiData = getKPISummaryExpedicao(filteredData, selectedTurno, selectedDate);
 
   if (loading) {
     return (
@@ -88,7 +88,7 @@ export const Expedicao = () => {
       />
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
         <KPICard
           title="Total Pallets"
           value={kpiData.totalPallets}
@@ -99,6 +99,18 @@ export const Expedicao = () => {
           title="Total Cargas"
           value={kpiData.totalCargas}
           subtitle="Cargas processadas"
+          icon={Truck}
+        />
+        <KPICard
+          title="Dedutível"
+          value={kpiData.totalDedutivel}
+          subtitle="Pallets desceram"
+          icon={Package}
+        />
+        <KPICard
+          title="FPLOG"
+          value={kpiData.totalFplog}
+          subtitle="Cargas FPLOG"
           icon={Truck}
         />
         <KPICard

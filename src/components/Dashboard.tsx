@@ -10,8 +10,9 @@ import { loadSeparacaoData, getAvailableDates, getKPISummarySeparacao, getTempoS
 import { loadMateriaPrimaData, getAvailableMateriaPrimaDates, getKPISummaryMateriaPrima, type MateriaPrimaData } from "@/utils/materiaPrimaTsvLoader";
 import { loadExpedicaoData, getAvailableExpedicaoDates, getKPISummaryExpedicao, type ExpedicaoData } from "@/utils/expedicaoTsvLoader";
 import { loadRecebimentoMeData, getAvailableRecebimentoMeDates, getKPISummaryRecebimentoMe, type RecebimentoMeData } from "@/utils/recebimentoMeTsvLoader";
-import { loadArmazemEstojosData, getAvailableDates as getAvailableArmazemEstojosDates, getKPISummaryArmazemEstojos, type ArmazemEstojosData } from "@/utils/armazemEstojosTsvLoader";
+import { loadArmazemEstojosData, getAvailableDates as getAvailableArmazemEstojosDates, getKPISummaryArmazemEstojos, getTempoSemPNPArmazemEstojos, type ArmazemEstojosData } from "@/utils/armazemEstojosTsvLoader";
 import { LinhasRodaramModal } from "./ArmazemEstojosKPIModals";
+import { ArmazemEstojosPNPModal } from "./ArmazemEstojosPNPModal";
 import { PNPHistoricoModal } from "./PNPHistoricoModal";
 import { WebsiteModal } from "./WebsiteModal";
 
@@ -19,7 +20,7 @@ import { WebsiteModal } from "./WebsiteModal";
 const formatBrazilianDate = (dateStr: string) => {
   const dateOnly = dateStr.split(' ')[0];
   if (dateOnly.includes('/')) {
-    return dateOnly; // Já está no formato DD/MM/YYYY
+    return dateOnly; 
   }
   return dateOnly;
 };
@@ -163,12 +164,13 @@ export const Dashboard = () => {
 
   const kpiSeparacao = getKPISummarySeparacao(filteredSeparacaoData, selectedTurno);
   const kpiMateriaPrima = getKPISummaryMateriaPrima(filteredMateriaPrimaData, selectedTurno);
-  const kpiExpedicao = getKPISummaryExpedicao(filteredExpedicaoData, selectedTurno, selectedDate);
+  const kpiExpedicao = getKPISummaryExpedicao(expedicaoData, selectedTurno, selectedDate);
   const kpiRecebimentoMe = getKPISummaryRecebimentoMe(filteredRecebimentoMeData, selectedTurno);
   const kpiArmazemEstojos = getKPISummaryArmazemEstojos(filteredArmazemEstojosData, selectedTurno);
   
   // Calcular tempo sem PNP usando todos os dados (não filtrados)
   const tempoSemPnp = getTempoSemPNP(separacaoData);
+  const tempoSemPnpArmazemEstojos = getTempoSemPNPArmazemEstojos(armazemEstojosData);
 
   return (
     <div className="space-y-4 px-2 sm:px-0">
@@ -212,7 +214,7 @@ export const Dashboard = () => {
             <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <KPICard
               title="Total Linhas"
               value={kpiSeparacao.totalLinhas}
@@ -237,20 +239,6 @@ export const Dashboard = () => {
               gradient={kpiSeparacao.temPnp ? "accent" : "primary"}
               className="col-span-1"
             />
-            <WebsiteModal
-              url="https://www.youtube.com"
-              title="Sistema de Contagem"
-              buttonText="Visualizar contagem"
-            >
-              <KPICard
-                title="Sistema"
-                value="Externo"
-                subtitle="Visualizar contagem"
-                icon={ExternalLink}
-                gradient="secondary"
-                className="col-span-1 cursor-pointer"
-              />
-            </WebsiteModal>
           </div>
           
           {/* Detalhes por Turno - Separação */}
@@ -338,7 +326,7 @@ export const Dashboard = () => {
             <Truck className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
             <KPICard
               title="Total Programado"
               value={kpiExpedicao.totalProgramado}
@@ -371,6 +359,22 @@ export const Dashboard = () => {
               gradient="accent"
               className="col-span-1"
             />
+            <KPICard
+              title="Dedutível"
+              value={kpiExpedicao.totalDedutivel}
+              subtitle="Pallets desceram"
+              icon={Package}
+              gradient="primary"
+              className="col-span-1"
+            />
+            <KPICard
+              title="FPLOG"
+              value={kpiExpedicao.totalFplog}
+              subtitle="Cargas FPLOG"
+              icon={Truck}
+              gradient="secondary"
+              className="col-span-1"
+            />
           </div>
           
           {/* Detalhes dos turnos de expedição */}
@@ -383,14 +387,22 @@ export const Dashboard = () => {
                     <p className="text-sm font-medium text-foreground">{turno.turno}</p>
                     <p className="text-xs text-muted-foreground">{turno.dataHora}</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 text-xs">
+                  <div className="grid grid-cols-4 gap-4 text-xs">
                     <div>
                       <span className="text-muted-foreground">Pallets: </span>
                       <strong className="text-primary">{turno.palletsExpedidos.split('/')[0]}</strong>
                     </div>
-                    <div>
+                     <div>
                       <span className="text-muted-foreground">Cargas: </span>
                       <strong className="text-secondary">{turno.totalCargas}</strong>
+                    </div>
+                     <div>
+                      <span className="text-muted-foreground">FPLOG: </span>
+                      <strong className="text-primary">{turno.fplog.split('/')[0]}</strong>
+                    </div>
+                      <div>
+                      <span className="text-muted-foreground">Dedutível: </span>
+                      <strong className="text-primary">{turno.dedutivel.split('/')[0]}</strong>
                     </div>
                   </div>
                   <div className="mt-2 text-xs">
@@ -486,12 +498,6 @@ export const Dashboard = () => {
                       <p className="text-xs text-muted-foreground">Waves em processo</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-primary">
-                      {kpiMateriaPrima.dataByTurno.reduce((acc, turno) => acc + parseInt(turno.waves?.separacao || '0'), 0)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">Total</p>
-                  </div>
                 </div>
                 <div className="space-y-2">
                   {kpiMateriaPrima.dataByTurno.map((turno, idx) => (
@@ -514,12 +520,6 @@ export const Dashboard = () => {
                       <p className="text-xs text-muted-foreground">Waves em pesagem</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-secondary">
-                      {kpiMateriaPrima.dataByTurno.reduce((acc, turno) => acc + parseInt(turno.waves?.pesagem || '0'), 0)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">Total</p>
-                  </div>
                 </div>
                 <div className="space-y-2">
                   {kpiMateriaPrima.dataByTurno.map((turno, idx) => (
@@ -541,12 +541,6 @@ export const Dashboard = () => {
                       <h5 className="font-semibold text-foreground">Fila</h5>
                       <p className="text-xs text-muted-foreground">Waves aguardando</p>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-accent">
-                      {kpiMateriaPrima.dataByTurno.reduce((acc, turno) => acc + parseInt(turno.waves?.fila || '0'), 0)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">Total</p>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -596,7 +590,7 @@ export const Dashboard = () => {
         </div>
       )}
 
-      {/* Recebimento ME Summary - Mobile Optimized */}
+      {/* Recebimento ME KPIs */}
       {filteredRecebimentoMeData.length > 0 && (
         <div className="bg-gradient-to-br from-card to-card/80 rounded-xl p-3 sm:p-6 border shadow-card animate-slide-up border-accent/20">
           <div className="flex items-center justify-between mb-4">
@@ -606,191 +600,247 @@ export const Dashboard = () => {
               </div>
               <div>
                 <h3 className="text-base sm:text-lg lg:text-xl font-bold text-foreground flex items-center gap-1 sm:gap-2">
-                  Recebimento ME
+                  Recebimento ME - KPIs
                   <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-primary animate-pulse" />
                 </h3>
-                <p className="text-xs text-muted-foreground font-medium hidden sm:block">Materiais e Embalagens • 2025</p>
+                <p className="text-xs text-muted-foreground font-medium">Materiais e Embalagens • 2025</p>
               </div>
             </div>
             <Truck className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           </div>
           
-          {/* KPIs de Recebimento ME */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-4">
-            <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded-lg p-3 text-center border border-primary/30">
-              <p className="text-xs text-muted-foreground">Veículos Programados</p>
-              <p className="text-lg font-bold text-primary">{kpiRecebimentoMe.totalVeiculosProgramados}</p>
-              <p className="text-xs text-muted-foreground">programados</p>
-            </div>
-            <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded-lg p-3 text-center border border-primary/30">
-              <p className="text-xs text-muted-foreground">Veículos Recebidos</p>
-              <p className="text-lg font-bold text-primary">{kpiRecebimentoMe.totalVeiculosRecebidos}</p>
-              <p className="text-xs text-muted-foreground">recebidos</p>
-            </div>
-            <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded-lg p-3 text-center border border-primary/30">
-              <p className="text-xs text-muted-foreground">Total Pallets</p>
-              <p className="text-lg font-bold text-primary">{kpiRecebimentoMe.totalPallets}</p>
-              <p className="text-xs text-muted-foreground">processados</p>
+          {/* Recebimento */}
+          <div className="mb-4">
+            <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              Recebimento
+            </h4>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <KPICard
+                title="Veículos Programados"
+                value={kpiRecebimentoMe.totalVeiculosProgramados}
+                subtitle="Programados"
+                icon={Package}
+                gradient="primary"
+                className="col-span-1"
+              />
+              <KPICard
+                title="Veículos Recebidos"
+                value={kpiRecebimentoMe.totalVeiculosRecebidos}
+                subtitle="Processados"
+                icon={CheckCircle2}
+                gradient="secondary"
+                className="col-span-1"
+              />
+               <KPICard
+                title="Total Pallets"
+                value={kpiRecebimentoMe.totalPallets}
+                subtitle="Pallets processados"
+                icon={Package}
+                gradient="accent"
+                className="col-span-1"
+              />
             </div>
           </div>
 
-          <div className="space-y-3 sm:space-y-4">
-            {filteredRecebimentoMeData.map((item, index) => {
-              const totalVeiculos = (parseInt(item.veiculosRecebido1T || '0') + parseInt(item.veiculosRecebido2T || '0') + parseInt(item.veiculosRecebidos3T || '0'));
-              const totalPallets = (parseInt(item.palletsRecebidos1T || '0') + parseInt(item.palletsRecebidos2T || '0') + parseInt(item.palletsRecebidos3T || '0'));
-              
-              return (
-                <div key={`recebimento-${index}`} className="bg-gradient-to-br from-primary/10 to-secondary/20 rounded-lg p-3 sm:p-4 border border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 animate-bounce-in">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h4 className="font-semibold text-foreground text-sm sm:text-base">Recebimento do Dia</h4>
-                      <p className="text-xs text-muted-foreground">{formatBrazilianDate(item.data)}</p>
+          {/* Detalhes por Turno - Recebimento ME */}
+          <div className="mt-6">
+            <h4 className="text-sm font-medium text-muted-foreground mb-3">Detalhes por Turno:</h4>
+            <div className="space-y-3">
+              {filteredRecebimentoMeData.map((item, index) => {
+                const totalVeiculos1T = parseInt(item.veiculosRecebido1T || '0');
+                const totalVeiculos2T = parseInt(item.veiculosRecebido2T || '0');
+                const totalVeiculos3T = parseInt(item.veiculosRecebidos3T || '0');
+                const totalPallets1T = parseInt(item.palletsRecebidos1T || '0');
+                const totalPallets2T = parseInt(item.palletsRecebidos2T || '0');
+                const totalPallets3T = parseInt(item.palletsRecebidos3T || '0');
+                
+                return (
+                  <div key={`recebimento-${index}`} className="bg-gradient-to-r from-primary/10 to-secondary/20 rounded-lg p-4 border border-primary/20">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-sm font-medium text-foreground">{formatBrazilianDate(item.data)}</p>
                     </div>
-                    <div className="text-right">
-                      <div className="flex items-center space-x-4">
-                        <div className="text-center">
-                          <p className="text-lg font-bold text-primary">{totalVeiculos}</p>
-                          <p className="text-xs text-muted-foreground">Veículos</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-lg font-bold text-primary">{totalPallets}</p>
-                          <p className="text-xs text-muted-foreground">Pallets</p>
-                        </div>
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded p-2 text-center border border-primary/20">
+                        <p className="text-xs text-muted-foreground font-semibold">Turno 1</p>
+                        <p className="text-lg font-bold text-foreground">{totalVeiculos1T}</p>
+                        <p className="text-xs text-muted-foreground">veículos</p>
+                        <p className="text-sm font-semibold text-primary">{totalPallets1T} pallets</p>
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-2 mb-3">
-                    <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded p-2 text-center border border-primary/20">
-                      <p className="text-xs text-muted-foreground">Turno 1</p>
-                      <p className="font-semibold text-foreground text-sm">{item.veiculosRecebido1T || '0'} veículos</p>
-                      <p className="text-xs text-muted-foreground">{item.palletsRecebidos1T || '0'} pallets</p>
-                    </div>
-                    <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded p-2 text-center border border-primary/20">
-                      <p className="text-xs text-muted-foreground">Turno 2</p>
-                      <p className="font-semibold text-foreground text-sm">{item.veiculosRecebido2T || '0'} veículos</p>
-                      <p className="text-xs text-muted-foreground">{item.palletsRecebidos2T || '0'} pallets</p>
-                    </div>
-                    <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded p-2 text-center border border-primary/20">
-                      <p className="text-xs text-muted-foreground">Turno 3</p>
-                      <p className="font-semibold text-foreground text-sm">{item.veiculosRecebidos3T || '0'} veículos</p>
-                      <p className="text-xs text-muted-foreground">{item.palletsRecebidos3T || '0'} pallets</p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-gradient-to-br from-red-500/20 to-red-600/10 rounded p-2 text-center border border-red-500/20">
-                      <p className="text-xs text-red-700">Chamados Abertos</p>
-                      <p className="font-semibold text-red-700 text-sm">
-                        {(parseInt(item.chamadosAbertos1T || '0') + parseInt(item.chamadosAbertos2T || '0') + parseInt(item.chamadosAbertos3T || '0'))}
-                      </p>
-                    </div>
-                    <div className="bg-gradient-to-br from-green-500/20 to-green-600/10 rounded p-2 text-center border border-green-500/20">
-                      <p className="text-xs text-green-700">Chamados Resolvidos</p>
-                      <p className="font-semibold text-green-700 text-sm">
-                        {(parseInt(item.chamadosResolvidos1T || '0') + parseInt(item.chamadosResolvidos2T || '0') + parseInt(item.chamadosResolvidos3T || '0'))}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+                      <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded p-2 text-center border border-primary/20">
+                        <p className="text-xs text-muted-foreground font-semibold">Turno 2</p>
+                        <p className="text-lg font-bold text-foreground">{totalVeiculos2T}</p>
+                        <p className="text-xs text-muted-foreground">veículos</p>
+                        <p className="text-sm font-semibold text-primary">{totalPallets2T} pallets</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded p-2 text-center border border-primary/20">
+                        <p className="text-xs text-muted-foreground font-semibold">Turno 3</p>
+                        <p className="text-lg font-bold text-foreground">{totalVeiculos3T}</p>
+                        <p className="text-xs text-muted-foreground">veículos</p>
+                         <p className="text-sm font-semibold text-primary">{totalPallets3T} pallets</p>
+                       </div>
+                     </div>
+                     
+                     {/* Chamados Abertos e Resolvidos */}
+                     <div className="mt-4">
+                       <div className="grid grid-cols-2 gap-2">
+                         <div className="bg-gradient-to-br from-red-500/20 to-red-600/10 rounded p-2 text-center border border-red-500/20">
+                           <p className="text-xs text-red-700">Chamados Abertos</p>
+                           <p className="font-semibold text-red-700 text-sm">
+                             {(parseInt(item.chamadosAbertos1T || '0') + parseInt(item.chamadosAbertos2T || '0') + parseInt(item.chamadosAbertos3T || '0'))}
+                           </p>
+                         </div>
+                         <div className="bg-gradient-to-br from-green-500/20 to-green-600/10 rounded p-2 text-center border border-green-500/20">
+                           <p className="text-xs text-green-700">Chamados Resolvidos</p>
+                           <p className="font-semibold text-green-700 text-sm">
+                             {(parseInt(item.chamadosResolvidos1T || '0') + parseInt(item.chamadosResolvidos2T || '0') + parseInt(item.chamadosResolvidos3T || '0'))}
+                           </p>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                 );
+               })}
+             </div>
+           </div>
+         </div>
+       )}
 
-      {/* Armazém Estojos Summary - Mobile Optimized */}
+      {/* Armazém Estojos KPIs */}
       {filteredArmazemEstojosData.length > 0 && (
         <div className="bg-gradient-to-br from-card to-card/80 rounded-xl p-3 sm:p-6 border shadow-card animate-slide-up border-accent/20">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="p-1.5 sm:p-2 bg-gradient-to-r from-accent to-secondary rounded-lg animate-glow">
+              <div className="p-1.5 sm:p-2 bg-gradient-to-r from-accent to-primary rounded-lg animate-glow">
                 <Warehouse className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div>
                 <h3 className="text-base sm:text-lg lg:text-xl font-bold text-foreground flex items-center gap-1 sm:gap-2">
-                  Armazém Estojos
+                  Armazém Estojos - KPIs
                   <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-accent animate-pulse" />
                 </h3>
-                <p className="text-xs text-muted-foreground font-medium hidden sm:block">Controle de Armazenagem • 2025</p>
+                <p className="text-xs text-muted-foreground font-medium">Operações de Armazenagem • 2025</p>
               </div>
             </div>
-            <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-accent" />
+            <Warehouse className="h-4 w-4 sm:h-5 sm:w-5 text-accent" />
+          </div>
+          
+          {/* Armazenagem */}
+          <div className="mb-4">
+            <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+              <Warehouse className="h-4 w-4" />
+              Armazenagem
+            </h4>
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+              <KPICard
+                title="Cargas Programadas"
+                value={kpiArmazemEstojos.totalCargasProgramadas}
+                subtitle="Programadas"
+                icon={Package}
+                gradient="primary"
+                className="col-span-1"
+              />
+              <KPICard
+                title="Cargas Recebidas"
+                value={kpiArmazemEstojos.totalCargasRecebidas}
+                subtitle="Processadas"
+                icon={CheckCircle2}
+                gradient="secondary"
+                className="col-span-1"
+              />
+              <KPICard
+                title="Pallets Armazenados"
+                value={kpiArmazemEstojos.totalPalletsArmazenados}
+                subtitle="Armazenados"
+                icon={Package}
+                gradient="accent"
+                className="col-span-1"
+              />
+              <KPICard
+                title="Pallets Movimentados"
+                value={kpiArmazemEstojos.totalPalletsMovimentados}
+                subtitle="Movimentados"
+                icon={Activity}
+                gradient="primary"
+                className="col-span-1"
+              />
+              <LinhasRodaramModal data={filteredArmazemEstojosData}>
+                <KPICard
+                  title="Linhas que Rodaram"
+                  value={kpiArmazemEstojos.totalLinhasRodaram}
+                  subtitle="Linhas ativas"
+                  icon={TrendingUp}
+                  gradient="secondary"
+                  className="col-span-1"
+                />
+              </LinhasRodaramModal>
+            </div>
           </div>
 
-          {/* KPIs Section */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-4">
-            <div className="bg-gradient-to-br from-primary/20 to-accent/10 rounded-lg p-3 text-center border border-primary/30">
-              <p className="text-xs text-muted-foreground">Cargas Programadas</p>
-              <p className="text-lg font-bold text-primary">{kpiArmazemEstojos.totalCargasProgramadas}</p>
-            </div>
-            <div className="bg-gradient-to-br from-secondary/20 to-accent/10 rounded-lg p-3 text-center border border-secondary/30">
-              <p className="text-xs text-muted-foreground">Cargas Recebidas</p>
-              <p className="text-lg font-bold text-secondary">{kpiArmazemEstojos.totalCargasRecebidas}</p>
-            </div>
-            <div className="bg-gradient-to-br from-accent/20 to-primary/10 rounded-lg p-3 text-center border border-accent/30">
-              <p className="text-xs text-muted-foreground">Pallets Armazenados</p>
-              <p className="text-lg font-bold text-accent">{kpiArmazemEstojos.totalPalletsArmazenados}</p>
-            </div>
-            <LinhasRodaramModal data={filteredArmazemEstojosData}>
-              <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded-lg p-3 text-center border border-primary/30 cursor-pointer hover:shadow-lg transition-all">
-                <p className="text-xs text-muted-foreground">Linhas que Rodaram</p>
-                <p className="text-lg font-bold text-primary">{kpiArmazemEstojos.totalLinhasRodaram}</p>
-              </div>
-            </LinhasRodaramModal>
-            <div className="bg-gradient-to-br from-secondary/20 to-accent/10 rounded-lg p-3 text-center border border-secondary/30">
-              <p className="text-xs text-muted-foreground">Status PNP</p>
-              <p className="text-lg font-bold text-secondary">
-                {filteredArmazemEstojosData.filter(item => !item.reportarPNP.toLowerCase().includes('sem pnp')).length}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {filteredArmazemEstojosData.filter(item => item.reportarPNP.toLowerCase().includes('sem pnp')).length} sem PNP
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-3 sm:space-y-4">
-            {filteredArmazemEstojosData.map((item, index) => (
-              <div key={`armazem-${index}`} className="bg-gradient-to-br from-accent/10 to-secondary/20 rounded-lg p-3 sm:p-4 border border-accent/30 transition-all duration-300 hover:shadow-lg hover:shadow-accent/20 animate-bounce-in">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <h4 className="font-semibold text-foreground text-sm sm:text-base">{item.turno}</h4>
+          {/* Detalhes por Turno - Armazém Estojos */}
+          <div className="mt-6">
+            <h4 className="text-sm font-medium text-muted-foreground mb-3">Detalhes por Turno:</h4>
+            <div className="space-y-3">
+              {filteredArmazemEstojosData.map((item, index) => (
+                <div key={`armazem-${index}`} className="bg-gradient-to-r from-accent/10 to-primary/20 rounded-lg p-4 border border-accent/20">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm font-medium text-foreground">{item.turno}</p>
                     <p className="text-xs text-muted-foreground">{formatBrazilianDate(item.dataHora)}</p>
                   </div>
-                  <div className="text-right">
-                    <div className="flex items-center space-x-4">
-                      <div className="text-center">
-                        <p className="text-lg font-bold text-accent">{item.cargasProgramadas}</p>
-                        <p className="text-xs text-muted-foreground">Programadas</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-lg font-bold text-accent">{item.palletsArmazenados}</p>
-                        <p className="text-xs text-muted-foreground">Armazenados</p>
-                      </div>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+                    <div className="bg-gradient-to-br from-primary/20 to-accent/10 rounded p-3 text-center border border-primary/20">
+                      <p className="text-xs text-muted-foreground font-semibold">Cargas Programadas</p>
+                      <p className="text-lg font-bold text-foreground">{item.cargasProgramadas}</p>
+                      <p className="text-xs text-muted-foreground">programadas</p>
+                    </div>
+                    <div className="bg-gradient-to-br from-secondary/20 to-accent/10 rounded p-3 text-center border border-secondary/20">
+                      <p className="text-xs text-muted-foreground font-semibold">Cargas Recebidas</p>
+                      <p className="text-lg font-bold text-foreground">{item.cargasRecebidos}</p>
+                      <p className="text-xs text-muted-foreground">recebidas</p>
+                    </div>
+                    <div className="bg-gradient-to-br from-accent/20 to-primary/10 rounded p-3 text-center border border-accent/20">
+                      <p className="text-xs text-muted-foreground font-semibold">Pallets Armazenados</p>
+                      <p className="text-lg font-bold text-foreground">{item.palletsArmazenados}</p>
+                      <p className="text-xs text-muted-foreground">armazenados</p>
+                    </div>
+                    <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded p-3 text-center border border-primary/20">
+                      <p className="text-xs text-muted-foreground font-semibold">Pallets Movimentados</p>
+                      <p className="text-lg font-bold text-foreground">{item.palletsMovimentados}</p>
+                      <p className="text-xs text-muted-foreground">movimentados</p>
                     </div>
                   </div>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-gradient-to-br from-primary/20 to-accent/10 rounded p-2 text-center border border-primary/20">
-                    <p className="text-xs text-muted-foreground">Cargas Programadas</p>
-                    <p className="font-semibold text-foreground text-sm">{item.cargasProgramadas}</p>
-                  </div>
-                  <div className="bg-gradient-to-br from-secondary/20 to-accent/10 rounded p-2 text-center border border-secondary/20">
-                    <p className="text-xs text-muted-foreground">Cargas Recebidas</p>
-                    <p className="font-semibold text-foreground text-sm">{item.cargasRecebidos}</p>
-                  </div>
-                  <div className="bg-gradient-to-br from-accent/20 to-secondary/10 rounded p-2 text-center border border-accent/20">
-                    <p className="text-xs text-muted-foreground">Pallets Armazenados</p>
-                    <p className="font-semibold text-foreground text-sm">{item.palletsArmazenados}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
-    </div>
-  );
-};
+                </div>
+              ))}
+             </div>
+           </div>
+
+           {/* Tempo sem PNP por Fábrica - Armazém Estojos */}
+           <div className="mt-4 space-y-2">
+             <h4 className="text-sm font-medium text-muted-foreground">Tempo sem PNP por Fábrica:</h4>
+             <div className="grid grid-cols-1 gap-3">
+               <ArmazemEstojosPNPModal data={armazemEstojosData}>
+                 <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-800 transition-all hover:shadow-lg cursor-pointer">
+                   <div className="flex items-center space-x-2 mb-2">
+                     <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                     <p className="text-sm font-semibold text-purple-700 dark:text-purple-400">Fábrica de Estojos</p>
+                   </div>
+                   <p className="text-lg font-bold text-purple-600 dark:text-purple-400">{tempoSemPnpArmazemEstojos.status}</p>
+                   {tempoSemPnpArmazemEstojos.ultimoPnp && (
+                     <p className="text-xs text-purple-600 dark:text-purple-500 mt-1">
+                       Último PNP: {tempoSemPnpArmazemEstojos.ultimoPnp.toLocaleString('pt-BR')}
+                     </p>
+                   )}
+                   <p className="text-xs text-muted-foreground mt-2 opacity-70">
+                     Clique para ver histórico completo
+                   </p>
+                 </div>
+               </ArmazemEstojosPNPModal>
+             </div>
+           </div>
+         </div>
+       )}
+
+     </div>
+   );
+ };

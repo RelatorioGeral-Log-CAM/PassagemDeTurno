@@ -6,7 +6,8 @@ import {
   Archive, 
   Boxes,
   BarChart3,
-  Building2 
+  Building2,
+  QrCode
 } from "lucide-react";
 
 import {
@@ -25,38 +26,22 @@ const navigationItems = [
   { 
     title: "Dashboard", 
     id: "dashboard", 
-    icon: BarChart3,
-    description: "Visão geral"
+    icon: BarChart3
   },
   { 
-    title: "Separação", 
-    id: "separacao", 
-    icon: Clock,
-    description: "Controle de separação"
+    title: "$ Campo Transitório", 
+    id: "campo-transitorio", 
+    icon: Users
   },
   { 
-    title: "Matéria Prima", 
-    id: "materia-prima", 
-    icon: Package,
-    description: "Recebimento MP"
+    title: "Conexões", 
+    id: "conexoes", 
+    icon: Package
   },
   { 
-    title: "Expedição", 
-    id: "expedicao", 
-    icon: Truck,
-    description: "Gestão de expedição"
-  },
-  { 
-    title: "Recebimento ME", 
-    id: "recebimento-me", 
-    icon: Archive,
-    description: "Materiais e embalagens"
-  },
-  { 
-    title: "Armazém Estojos", 
-    id: "armazem-estojos", 
-    icon: Boxes,
-    description: "Controle de armazenagem"
+    title: "Registro de presença", 
+    id: "registro-presenca", 
+    icon: QrCode
   },
 ];
 
@@ -78,20 +63,22 @@ export function AppSidebar({ currentPage, onNavigate }: AppSidebarProps) {
     >
       <SidebarContent>
         <SidebarGroup>
-          <div className="flex items-center gap-3 px-3 py-4 border-b border-border">
-            <Building2 className="h-8 w-8 text-primary flex-shrink-0" />
-            {!collapsed && (
-              <div>
-                <h1 className="text-lg font-bold text-foreground leading-tight">
-                  Logística CAM
-                </h1>
-                <p className="text-xs text-muted-foreground">Grupo Boticário</p>
-              </div>
-            )}
+          <div className="bg-gradient-primary p-4 border-b border-border/20">
+            <div className="flex items-center gap-3">
+              <Building2 className="h-8 w-8 text-white flex-shrink-0" />
+              {!collapsed && (
+                <div className="text-white">
+                  <h1 className="text-lg font-bold leading-tight">
+                    Passagem de Turno
+                  </h1>
+                  <p className="text-sm opacity-90 font-medium">Logística CAM - Grupo Boticário</p>
+                </div>
+              )}
+            </div>
           </div>
           
-          <SidebarGroupLabel className="px-3 py-2">
-            {collapsed ? "Menu" : "Passagem de Turno"}
+          <SidebarGroupLabel className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            {collapsed ? "Menu" : "Navegação"}
           </SidebarGroupLabel>
 
           <SidebarGroupContent>
@@ -111,10 +98,7 @@ export function AppSidebar({ currentPage, onNavigate }: AppSidebarProps) {
                   >
                     <item.icon className={`h-5 w-5 ${collapsed ? "" : "mr-3"} flex-shrink-0`} />
                     {!collapsed && (
-                      <div className="flex flex-col items-start">
-                        <span className="text-sm font-medium">{item.title}</span>
-                        <span className="text-xs text-muted-foreground">{item.description}</span>
-                      </div>
+                      <span className="text-sm font-medium">{item.title}</span>
                     )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>

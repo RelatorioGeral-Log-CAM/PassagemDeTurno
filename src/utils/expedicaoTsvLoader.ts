@@ -14,11 +14,13 @@ export interface ExpedicaoData {
   fifo5: string;
   observacao: string;
   responsavel: string;
+  dedutivel: string;
+  fplog: string;
 }
 
 export const loadExpedicaoData = async (): Promise<ExpedicaoData[]> => {
   try {
-    const response = await fetch('/expedicao-data.tsv');
+    const response = await fetch(`${import.meta.env.BASE_URL}expedicao-data.tsv`);
     if (!response.ok) {
       throw new Error('Failed to load TSV data');
     }
@@ -44,7 +46,9 @@ export const loadExpedicaoData = async (): Promise<ExpedicaoData[]> => {
         fifo4: values[11] || '',
         fifo5: values[12] || '',
         observacao: values[13] || '',
-        responsavel: values[14] || ''
+        responsavel: values[14] || '',
+        dedutivel: values[15] || '',
+        fplog: values[16] || ''
       };
     });
   } catch (error) {
@@ -74,63 +78,82 @@ export const getExpedicaoTurnos = (): string[] => {
 };
 
 export const getKPISummaryExpedicao = (data: ExpedicaoData[], turnoFilter: string = 'todos', selectedDate?: string) => {
-  const filteredData = turnoFilter === 'todos' 
-    ? data 
-    : data.filter(item => item.turno === turnoFilter);
+  const toIsoDate = (dateStr: string) => {
+    const dateOnly = dateStr.split(' ')[0];
+    if (dateOnly.includes('/')) {
+      const parts = dateOnly.split('/');
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+    }
+    return dateOnly;
+  };
 
-  const totalPallets = filteredData.reduce((acc, item) => {
-    // Extrair números da string de pallets expedidos
-    const pallets = parseInt(item.palletsExpedidos.split('/')[0] || '0');
-    return acc + pallets;
+  const byTurno = turnoFilter === 'todos' ? data : data.filter(item => item.turno === turnoFilter);
+
+  const datasetForTotals = selectedDate
+    ? byTurno.filter(item => toIsoDate(item.dataHora) === selectedDate)
+    : byTurno;
+
+  const totalPallets = datasetForTotals.reduce((acc, item) => {
+    const pallets = parseInt((item.palletsExpedidos?.toString() || '0').split('/')[0]);
+    return acc + (isNaN(pallets) ? 0 : pallets);
   }, 0);
 
-  // Lógica para pallets programados: mostrar do dia anterior
+  const totalCargas = datasetForTotals.reduce((acc, item) => {
+    const cargas = parseInt(item.totalCargas || '0');
+    return acc + (isNaN(cargas) ? 0 : cargas);
+  }, 0);
+
+  const totalDedutivel = datasetForTotals.reduce((acc, item) => {
+    const dedutivel = parseInt(item.dedutivel || '0');
+    return acc + (isNaN(dedutivel) ? 0 : dedutivel);
+  }, 0);
+
+  const totalFplog = datasetForTotals.reduce((acc, item) => {
+    const fplog = parseInt(item.fplog || '0');
+    return acc + (isNaN(fplog) ? 0 : fplog);
+  }, 0);
+
+  const turnosAtivos = datasetForTotals.length;
+
   let totalProgramado = 0;
   if (selectedDate) {
-    // Calcular data anterior
     const currentDate = new Date(selectedDate);
     const previousDate = new Date(currentDate);
     previousDate.setDate(currentDate.getDate() - 1);
     const previousDateStr = previousDate.toISOString().split('T')[0];
-    
-    // Filtrar dados do dia anterior para programados
-    const previousDayData = data.filter(item => {
-      const dateOnly = item.dataHora.split(' ')[0];
-      let itemDate = dateOnly;
-      if (dateOnly.includes('/')) {
-        const parts = dateOnly.split('/');
-        if (parts.length === 3) {
-          itemDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-        }
-      }
-      return itemDate === previousDateStr;
-    });
-    
-    totalProgramado = previousDayData.reduce((acc, item) => {
-      return acc + parseInt(item.programados || '0');
+
+    // Buscar apenas o TURNO 2 do dia anterior (onde são inseridos os programados)
+    const previousDayTurno2 = data.filter(item => 
+      toIsoDate(item.dataHora) === previousDateStr && item.turno === 'TURNO 2'
+    );
+
+    totalProgramado = previousDayTurno2.reduce((acc, item) => {
+      const prog = parseInt(item.programados || '0');
+      return acc + (isNaN(prog) ? 0 : prog);
     }, 0);
   } else {
-    totalProgramado = filteredData.reduce((acc, item) => {
-      return acc + parseInt(item.programados || '0');
+    // Quando não há data selecionada, buscar apenas TURNO 2 para programados
+    const turno2Data = data.filter(item => item.turno === 'TURNO 2');
+    totalProgramado = turno2Data.reduce((acc, item) => {
+      const prog = parseInt(item.programados || '0');
+      return acc + (isNaN(prog) ? 0 : prog);
     }, 0);
   }
 
-  const totalCargas = filteredData.reduce((acc, item) => {
-    return acc + parseInt(item.totalCargas || '0');
-  }, 0);
-
-  const avgPalletsPorTurno = filteredData.length > 0 ? Math.round(totalPallets / filteredData.length) : 0;
-  const avgCargasPorTurno = filteredData.length > 0 ? Math.round(totalCargas / filteredData.length) : 0;
-  
-  const turnosAtivos = filteredData.length;
+  const avgPalletsPorTurno = turnosAtivos > 0 ? Math.round(totalPallets / turnosAtivos) : 0;
+  const avgCargasPorTurno = turnosAtivos > 0 ? Math.round(totalCargas / turnosAtivos) : 0;
 
   return {
     totalPallets,
     totalProgramado,
     totalCargas,
+    totalDedutivel,
+    totalFplog,
     avgPalletsPorTurno,
     avgCargasPorTurno,
     turnosAtivos,
-    eficiencia: turnosAtivos > 0 ? Math.round((totalCargas / (turnosAtivos * 10)) * 100) : 0 // Assumindo 10 cargas como meta por turno
+    eficiencia: totalProgramado > 0 ? Math.round((totalPallets / totalProgramado) * 100) : 0
   };
 };

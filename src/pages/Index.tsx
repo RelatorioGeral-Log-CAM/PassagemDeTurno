@@ -5,6 +5,7 @@ import { MateriaPrima } from "@/components/MateriaPrima";
 import { Expedicao } from "@/components/Expedicao";
 import { RecebimentoMe } from "@/components/RecebimentoMe";
 import { ArmazemEstojos } from "@/components/ArmazemEstojos";
+import { Conexoes } from "@/components/Conexoes";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -23,6 +24,8 @@ const Index = () => {
         return <RecebimentoMe />;
       case "armazem-estojos":
         return <ArmazemEstojos />;
+      case "conexoes":
+        return <Conexoes />;
       default:
         return <Dashboard />;
     }
@@ -45,6 +48,7 @@ const Index = () => {
                 {currentPage === "expedicao" && "Expedição"}
                 {currentPage === "recebimento-me" && "Recebimento ME"}
                 {currentPage === "armazem-estojos" && "Armazém Estojos"}
+                {currentPage === "conexoes" && "Conexões"}
               </h1>
             </div>
           </header>
