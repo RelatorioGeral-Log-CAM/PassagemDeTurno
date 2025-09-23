@@ -128,10 +128,18 @@ export const getKPISummaryRecebimentoMe = (data: RecebimentoMeData[], turnoFilte
   let totalVeiculosProgramados = 0;
   let totalVeiculosRecebidos = 0;
   let totalPallets = 0;
+  let totalVeiculosExtras = 0;
+  let totalAntecipados = 0;
+  let totalNoShow = 0;
+  let totalReprogramados = 0;
 
   filteredData.forEach(item => {
     // Somar veículos programados (não depende do filtro de turno)
     totalVeiculosProgramados += parseInt(item.veiculosProgramados || '0');
+    totalVeiculosExtras += parseInt(item.veiculosExtras || '0');
+    totalAntecipados += parseInt(item.antecipados || '0');
+    totalNoShow += parseInt(item.noShow || '0');
+    totalReprogramados += parseInt(item.reprogramados || '0');
 
     // Somar veículos recebidos e pallets por turno
     if (turnoFilter === 'todos' || turnoFilter === 'TURNO 1') {
@@ -157,6 +165,10 @@ export const getKPISummaryRecebimentoMe = (data: RecebimentoMeData[], turnoFilte
     totalVeiculosProgramados,
     totalVeiculosRecebidos,
     totalPallets,
+    totalVeiculosExtras,
+    totalAntecipados,
+    totalNoShow,
+    totalReprogramados,
     avgVeiculosPorDia,
     avgPalletsPorDia,
     diasAtivos,

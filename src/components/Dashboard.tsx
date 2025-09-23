@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Activity, Sparkles, TrendingUp, Package, Users, Truck, Clock, BarChart3, Warehouse, CheckCircle2, AlertTriangle, FileText, Layers, Timer, ExternalLink } from "lucide-react";
+import { Activity, Sparkles, TrendingUp, Package, Users, Truck, Clock, BarChart3, Warehouse, CheckCircle2, AlertTriangle, FileText, Layers, Timer, ExternalLink, ArrowUpDown } from "lucide-react";
 import { FiltroGeral } from "./FiltroGeral";
 import { KPICard } from "./KPICard";
 import { HoraHoraDashboard } from "./HoraHoraDashboard";
@@ -328,14 +328,6 @@ export const Dashboard = () => {
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
             <KPICard
-              title="Total Programado"
-              value={kpiExpedicao.totalProgramado}
-              subtitle="Pallets programados"
-              icon={FileText}
-              gradient="accent"
-              className="col-span-1"
-            />
-            <KPICard
               title="Total Pallets"
               value={kpiExpedicao.totalPallets}
               subtitle="Pallets expedidos"
@@ -346,17 +338,9 @@ export const Dashboard = () => {
             <KPICard
               title="Total Cargas"
               value={kpiExpedicao.totalCargas}
-              subtitle="Cargas processadas"
+              subtitle="Cargas Expedidas"
               icon={Truck}
               gradient="secondary"
-              className="col-span-1"
-            />
-            <KPICard
-              title="Média Pallets/Turno"
-              value={kpiExpedicao.avgPalletsPorTurno}
-              subtitle="Por turno ativo"
-              icon={TrendingUp}
-              gradient="accent"
               className="col-span-1"
             />
             <KPICard
@@ -368,11 +352,27 @@ export const Dashboard = () => {
               className="col-span-1"
             />
             <KPICard
-              title="FPLOG"
-              value={kpiExpedicao.totalFplog}
+              title="FPLOG em Atraso"
+              value={kpiExpedicao.totalFplogEmAtraso}
               subtitle="Cargas FPLOG"
-              icon={Truck}
-              gradient="secondary"
+              icon={AlertTriangle}
+              gradient="accent"
+              className="col-span-1"
+            />
+           <KPICard
+              title="Mapa em Atraso"
+              value={kpiExpedicao.totalMapaEmAtraso}
+              subtitle="Cargas Mapa"
+              icon={AlertTriangle}
+              gradient="accent"
+              className="col-span-1"
+            />
+           <KPICard
+              title="Odisseia em Atraso"
+              value={kpiExpedicao.totalOdisseiaEmAtraso}
+              subtitle="Cargas Odisseia"
+              icon={AlertTriangle}
+              gradient="accent"
               className="col-span-1"
             />
           </div>
@@ -387,7 +387,7 @@ export const Dashboard = () => {
                     <p className="text-sm font-medium text-foreground">{turno.turno}</p>
                     <p className="text-xs text-muted-foreground">{turno.dataHora}</p>
                   </div>
-                  <div className="grid grid-cols-4 gap-4 text-xs">
+                  <div className="grid grid-cols-3 gap-4 text-xs">
                     <div>
                       <span className="text-muted-foreground">Pallets: </span>
                       <strong className="text-primary">{turno.palletsExpedidos.split('/')[0]}</strong>
@@ -395,10 +395,6 @@ export const Dashboard = () => {
                      <div>
                       <span className="text-muted-foreground">Cargas: </span>
                       <strong className="text-secondary">{turno.totalCargas}</strong>
-                    </div>
-                     <div>
-                      <span className="text-muted-foreground">FPLOG: </span>
-                      <strong className="text-primary">{turno.fplog.split('/')[0]}</strong>
                     </div>
                       <div>
                       <span className="text-muted-foreground">Dedutível: </span>
@@ -632,7 +628,7 @@ export const Dashboard = () => {
                 gradient="secondary"
                 className="col-span-1"
               />
-               <KPICard
+              <KPICard
                 title="Total Pallets"
                 value={kpiRecebimentoMe.totalPallets}
                 subtitle="Pallets processados"
@@ -640,69 +636,107 @@ export const Dashboard = () => {
                 gradient="accent"
                 className="col-span-1"
               />
+                <KPICard
+                title="Veículos Extras"
+                value={kpiRecebimentoMe.totalVeiculosExtras}
+                subtitle="Extras"
+                icon={Truck}
+                gradient="primary"
+                className="col-span-1"
+              />
+                <KPICard
+                title="Antecipados"
+                value={kpiRecebimentoMe.totalAntecipados}
+                subtitle="Antecipados"
+                icon={Clock}
+                gradient="secondary"
+                className="col-span-1"
+              />
+              <KPICard
+                title="No Show"
+                value={kpiRecebimentoMe.totalNoShow}
+                subtitle="Não compareceram"
+                icon={AlertTriangle}
+                gradient="accent"
+                className="col-span-1"
+              />
+            </div>
+            {/* Segunda linha de KPIs */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mt-4">
+              <KPICard
+                title="Reprogramados"
+                value={kpiRecebimentoMe.totalReprogramados}
+                subtitle="Reagendados"
+                icon={Timer}
+                gradient="primary"
+                className="col-span-1"
+              />
             </div>
           </div>
 
           {/* Detalhes por Turno - Recebimento ME */}
-          <div className="mt-6">
-            <h4 className="text-sm font-medium text-muted-foreground mb-3">Detalhes por Turno:</h4>
-            <div className="space-y-3">
-              {filteredRecebimentoMeData.map((item, index) => {
-                const totalVeiculos1T = parseInt(item.veiculosRecebido1T || '0');
-                const totalVeiculos2T = parseInt(item.veiculosRecebido2T || '0');
-                const totalVeiculos3T = parseInt(item.veiculosRecebidos3T || '0');
-                const totalPallets1T = parseInt(item.palletsRecebidos1T || '0');
-                const totalPallets2T = parseInt(item.palletsRecebidos2T || '0');
-                const totalPallets3T = parseInt(item.palletsRecebidos3T || '0');
-                
-                return (
-                  <div key={`recebimento-${index}`} className="bg-gradient-to-r from-primary/10 to-secondary/20 rounded-lg p-4 border border-primary/20">
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-sm font-medium text-foreground">{formatBrazilianDate(item.data)}</p>
+            <div className="mt-4 space-y-2">
+            <h4 className="text-sm font-medium text-muted-foreground">Detalhes por Turno:</h4>
+            <div className="grid grid-cols-1 gap-3">
+              {filteredRecebimentoMeData.flatMap((item, itemIndex) => {
+                const turnos = [
+                  {
+                    turno: 'TURNO 1',
+                    dataHora: formatBrazilianDate(item.data),
+                    veiculos: parseInt(item.veiculosRecebido1T || '0'),
+                    pallets: parseInt(item.palletsRecebidos1T || '0'),
+                    chamadosAbertos: parseInt(item.chamadosAbertos1T || '0'),
+                    chamadosResolvidos: parseInt(item.chamadosResolvidos1T || '0'),
+                    key: `${itemIndex}-turno1`
+                  },
+                  {
+                    turno: 'TURNO 2',
+                    dataHora: formatBrazilianDate(item.data),
+                    veiculos: parseInt(item.veiculosRecebido2T || '0'),
+                    pallets: parseInt(item.palletsRecebidos2T || '0'),
+                    chamadosAbertos: parseInt(item.chamadosAbertos2T || '0'),
+                    chamadosResolvidos: parseInt(item.chamadosResolvidos2T || '0'),
+                    key: `${itemIndex}-turno2`
+                  },
+                  {
+                    turno: 'TURNO 3',
+                    dataHora: formatBrazilianDate(item.data),
+                    veiculos: parseInt(item.veiculosRecebidos3T || '0'),
+                    pallets: parseInt(item.palletsRecebidos3T || '0'),
+                    chamadosAbertos: parseInt(item.chamadosAbertos3T || '0'),
+                    chamadosResolvidos: parseInt(item.chamadosResolvidos3T || '0'),
+                    key: `${itemIndex}-turno3`
+                  }
+                ];
+                return turnos;
+              }).map((turno) => (
+                <div key={turno.key} className="bg-gradient-to-r from-primary/10 to-secondary/20 rounded-lg p-3 border border-primary/20">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-medium text-foreground">{turno.turno}</p>
+                    <p className="text-xs text-muted-foreground">{turno.dataHora}</p>
+                  </div>
+                  <div className="grid grid-cols-4 gap-4 text-xs">
+                    <div>
+                      <span className="text-muted-foreground">Veículos: </span>
+                      <strong className="text-primary">{turno.veiculos}</strong>
                     </div>
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded p-2 text-center border border-primary/20">
-                        <p className="text-xs text-muted-foreground font-semibold">Turno 1</p>
-                        <p className="text-lg font-bold text-foreground">{totalVeiculos1T}</p>
-                        <p className="text-xs text-muted-foreground">veículos</p>
-                        <p className="text-sm font-semibold text-primary">{totalPallets1T} pallets</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded p-2 text-center border border-primary/20">
-                        <p className="text-xs text-muted-foreground font-semibold">Turno 2</p>
-                        <p className="text-lg font-bold text-foreground">{totalVeiculos2T}</p>
-                        <p className="text-xs text-muted-foreground">veículos</p>
-                        <p className="text-sm font-semibold text-primary">{totalPallets2T} pallets</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded p-2 text-center border border-primary/20">
-                        <p className="text-xs text-muted-foreground font-semibold">Turno 3</p>
-                        <p className="text-lg font-bold text-foreground">{totalVeiculos3T}</p>
-                        <p className="text-xs text-muted-foreground">veículos</p>
-                         <p className="text-sm font-semibold text-primary">{totalPallets3T} pallets</p>
-                       </div>
-                     </div>
-                     
-                     {/* Chamados Abertos e Resolvidos */}
-                     <div className="mt-4">
-                       <div className="grid grid-cols-2 gap-2">
-                         <div className="bg-gradient-to-br from-red-500/20 to-red-600/10 rounded p-2 text-center border border-red-500/20">
-                           <p className="text-xs text-red-700">Chamados Abertos</p>
-                           <p className="font-semibold text-red-700 text-sm">
-                             {(parseInt(item.chamadosAbertos1T || '0') + parseInt(item.chamadosAbertos2T || '0') + parseInt(item.chamadosAbertos3T || '0'))}
-                           </p>
-                         </div>
-                         <div className="bg-gradient-to-br from-green-500/20 to-green-600/10 rounded p-2 text-center border border-green-500/20">
-                           <p className="text-xs text-green-700">Chamados Resolvidos</p>
-                           <p className="font-semibold text-green-700 text-sm">
-                             {(parseInt(item.chamadosResolvidos1T || '0') + parseInt(item.chamadosResolvidos2T || '0') + parseInt(item.chamadosResolvidos3T || '0'))}
-                           </p>
-                         </div>
-                       </div>
-                     </div>
-                   </div>
-                 );
-               })}
-             </div>
-           </div>
+                    <div>
+                      <span className="text-muted-foreground">Pallets: </span>
+                      <strong className="text-secondary">{turno.pallets}</strong>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Cham. Abertos: </span>
+                      <strong className="text-destructive">{turno.chamadosAbertos}</strong>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Cham. Resolvidos: </span>
+                      <strong className="text-green-600">{turno.chamadosResolvidos}</strong>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
          </div>
        )}
 
@@ -731,7 +765,7 @@ export const Dashboard = () => {
               <Warehouse className="h-4 w-4" />
               Armazenagem
             </h4>
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4">
               <KPICard
                 title="Cargas Programadas"
                 value={kpiArmazemEstojos.totalCargasProgramadas}
@@ -774,6 +808,14 @@ export const Dashboard = () => {
                   className="col-span-1"
                 />
               </LinhasRodaramModal>
+                <KPICard
+                title="Campo Transitório"
+                value={kpiArmazemEstojos.totalCamposTransitorios}
+                subtitle="Tarefas transitórias"
+                icon={ArrowUpDown}
+                gradient="accent"
+                className="col-span-1"
+              />
             </div>
           </div>
 
@@ -809,7 +851,6 @@ export const Dashboard = () => {
                       <p className="text-xs text-muted-foreground">movimentados</p>
                     </div>
                   </div>
-
                 </div>
               ))}
              </div>

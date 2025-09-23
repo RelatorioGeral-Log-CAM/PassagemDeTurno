@@ -2,7 +2,6 @@ export interface ExpedicaoData {
   turno: string;
   dataHora: string;
   palletsExpedidos: string;
-  programados: string;
   totalCargas: string;
   emDescida: string;
   zonaMista: string;
@@ -15,7 +14,10 @@ export interface ExpedicaoData {
   observacao: string;
   responsavel: string;
   dedutivel: string;
-  fplog: string;
+  fplogEmAtraso: string;
+  mapaEmAtraso: string;
+  odisseiaEmAtraso: string;
+  
 }
 
 export const loadExpedicaoData = async (): Promise<ExpedicaoData[]> => {
@@ -35,20 +37,21 @@ export const loadExpedicaoData = async (): Promise<ExpedicaoData[]> => {
         turno: values[0] || '',
         dataHora: values[1] || '',
         palletsExpedidos: values[2] || '',
-        programados: values[3] || '',
-        totalCargas: values[4] || '',
-        emDescida: values[5] || '',
-        zonaMista: values[6] || '',
-        pisoNovoArmazem: values[7] || '',
-        fifo1: values[8] || '',
-        fifo2: values[9] || '',
-        fifo3: values[10] || '',
-        fifo4: values[11] || '',
-        fifo5: values[12] || '',
-        observacao: values[13] || '',
-        responsavel: values[14] || '',
-        dedutivel: values[15] || '',
-        fplog: values[16] || ''
+        totalCargas: values[3] || '',
+        emDescida: values[4] || '',
+        zonaMista: values[5] || '',
+        pisoNovoArmazem: values[6] || '',
+        fifo1: values[7] || '',
+        fifo2: values[8] || '',
+        fifo3: values[9] || '',
+        fifo4: values[10] || '',
+        fifo5: values[11] || '',
+        observacao: values[12] || '',
+        responsavel: values[13] || '',
+        dedutivel: values[14] || '',
+        fplogEmAtraso: values[15] || '',
+        mapaEmAtraso: values[16] || '',
+        odisseiaEmAtraso: values[17] || ''
       };
     });
   } catch (error) {
@@ -110,50 +113,34 @@ export const getKPISummaryExpedicao = (data: ExpedicaoData[], turnoFilter: strin
     return acc + (isNaN(dedutivel) ? 0 : dedutivel);
   }, 0);
 
-  const totalFplog = datasetForTotals.reduce((acc, item) => {
-    const fplog = parseInt(item.fplog || '0');
+ const turnosAtivos = datasetForTotals.length;
+
+  const totalFplogEmAtraso = datasetForTotals.reduce((acc, item) => {
+    const fplog = parseInt(item.fplogEmAtraso || '0');
     return acc + (isNaN(fplog) ? 0 : fplog);
   }, 0);
 
-  const turnosAtivos = datasetForTotals.length;
+  const totalMapaEmAtraso = datasetForTotals.reduce((acc, item) => {
+    const mapa = parseInt(item.mapaEmAtraso || '0');
+    return acc + (isNaN(mapa) ? 0 : mapa);
+  }, 0);
 
-  let totalProgramado = 0;
-  if (selectedDate) {
-    const currentDate = new Date(selectedDate);
-    const previousDate = new Date(currentDate);
-    previousDate.setDate(currentDate.getDate() - 1);
-    const previousDateStr = previousDate.toISOString().split('T')[0];
+  const totalOdisseiaEmAtraso = datasetForTotals.reduce((acc, item) => {
+    const odisseia = parseInt(item.odisseiaEmAtraso || '0');
+    return acc + (isNaN(odisseia) ? 0 : odisseia);
+  }, 0);
 
-    // Buscar apenas o TURNO 2 do dia anterior (onde são inseridos os programados)
-    const previousDayTurno2 = data.filter(item => 
-      toIsoDate(item.dataHora) === previousDateStr && item.turno === 'TURNO 2'
-    );
-
-    totalProgramado = previousDayTurno2.reduce((acc, item) => {
-      const prog = parseInt(item.programados || '0');
-      return acc + (isNaN(prog) ? 0 : prog);
-    }, 0);
-  } else {
-    // Quando não há data selecionada, buscar apenas TURNO 2 para programados
-    const turno2Data = data.filter(item => item.turno === 'TURNO 2');
-    totalProgramado = turno2Data.reduce((acc, item) => {
-      const prog = parseInt(item.programados || '0');
-      return acc + (isNaN(prog) ? 0 : prog);
-    }, 0);
-  }
-
-  const avgPalletsPorTurno = turnosAtivos > 0 ? Math.round(totalPallets / turnosAtivos) : 0;
   const avgCargasPorTurno = turnosAtivos > 0 ? Math.round(totalCargas / turnosAtivos) : 0;
 
   return {
     totalPallets,
-    totalProgramado,
     totalCargas,
     totalDedutivel,
-    totalFplog,
-    avgPalletsPorTurno,
+    totalFplogEmAtraso,
+    totalMapaEmAtraso,
+    totalOdisseiaEmAtraso,
     avgCargasPorTurno,
     turnosAtivos,
-    eficiencia: totalProgramado > 0 ? Math.round((totalPallets / totalProgramado) * 100) : 0
+    eficiencia: turnosAtivos > 0 ? Math.round((totalCargas / turnosAtivos) * 100) / 10 : 0 // Eficiência baseada em cargas por turno
   };
 };

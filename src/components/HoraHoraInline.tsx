@@ -162,28 +162,67 @@ export const HoraHoraInline = ({ selectedDate }: HoraHoraInlineProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={hourlyChartData}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                  <XAxis 
-                    dataKey="hora" 
-                    tick={{ fontSize: 11 }}
-                    interval="preserveStartEnd"
-                  />
-                  <YAxis tick={{ fontSize: 11 }} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line 
-                    type="monotone" 
-                    dataKey="pallets" 
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={2}
-                    dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 3 }}
-                    activeDot={{ r: 4, fill: "hsl(var(--primary))" }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
+            {/* Desktop: Rótulos inclinados */}
+            <div className="hidden md:block">
+              <ChartContainer config={chartConfig} className="h-[220px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={hourlyChartData} margin={{ bottom: 30, left: 5, right: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                    <XAxis 
+                      dataKey="hora" 
+                      tick={{ fontSize: 9, textAnchor: 'end' }}
+                      interval={0}
+                      tickMargin={5}
+                      angle={-45}
+                    />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar 
+                      dataKey="pallets" 
+                      fill="hsl(var(--primary))"
+                      radius={[4, 4, 0, 0]}
+                    >
+                      <LabelList 
+                        dataKey="pallets" 
+                        position="top" 
+                        style={{ fontSize: '9px', fontWeight: '500', fill: 'hsl(var(--foreground))' }}
+                      />
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </div>
+            
+            {/* Mobile: Gráfico rolável horizontal */}
+            <div className="md:hidden overflow-x-auto">
+              <div style={{ minWidth: '800px' }}>
+                <ChartContainer config={chartConfig} className="h-[200px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={hourlyChartData} margin={{ left: 10, right: 10 }}>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                      <XAxis 
+                        dataKey="hora" 
+                        tick={{ fontSize: 10 }}
+                        interval={0}
+                      />
+                      <YAxis tick={{ fontSize: 10 }} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar 
+                        dataKey="pallets" 
+                        fill="hsl(var(--primary))"
+                        radius={[4, 4, 0, 0]}
+                      >
+                        <LabelList 
+                          dataKey="pallets" 
+                          position="top" 
+                          style={{ fontSize: '9px', fontWeight: '500', fill: 'hsl(var(--foreground))' }}
+                        />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

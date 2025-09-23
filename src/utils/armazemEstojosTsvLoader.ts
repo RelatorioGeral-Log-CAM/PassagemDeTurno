@@ -93,7 +93,8 @@ export const getKPISummaryArmazemEstojos = (data: ArmazemEstojosData[], selected
       totalCargasRecebidas: 0,
       totalPalletsArmazenados: 0,
       totalPalletsMovimentados: 0,
-      totalLinhasRodaram: 0
+      totalLinhasRodaram: 0,
+      totalCamposTransitorios: 0
     };
   }
 
@@ -104,13 +105,14 @@ export const getKPISummaryArmazemEstojos = (data: ArmazemEstojosData[], selected
   const totalPalletsArmazenados = filteredData.reduce((sum, item) => sum + (parseInt(item.palletsArmazenados) || 0), 0);
   const totalPalletsMovimentados = filteredData.reduce((sum, item) => sum + (parseInt(item.palletsMovimentados) || 0), 0);
   const totalLinhasRodaram = filteredData.reduce((sum, item) => sum + (parseInt(item.qtdLinhasRodaram) || 0), 0);
-
+  const totalCamposTransitorios = filteredData.reduce((sum, item) => sum + (parseInt(item.camposTransitorios) || 0), 0);
   return {
     totalCargasProgramadas,
     totalCargasRecebidas,
     totalPalletsArmazenados,
     totalPalletsMovimentados,
-    totalLinhasRodaram
+    totalLinhasRodaram,
+    totalCamposTransitorios
   };
 };
 

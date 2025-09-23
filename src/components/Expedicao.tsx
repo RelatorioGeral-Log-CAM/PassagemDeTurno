@@ -108,16 +108,10 @@ export const Expedicao = () => {
           icon={Package}
         />
         <KPICard
-          title="FPLOG"
-          value={kpiData.totalFplog}
-          subtitle="Cargas FPLOG"
-          icon={Truck}
-        />
-        <KPICard
-          title="Média Pallets/Turno"
-          value={kpiData.avgPalletsPorTurno}
-          subtitle="Por turno ativo"
-          icon={TrendingUp}
+          title="Dedutível"
+          value={kpiData.totalDedutivel}
+          subtitle="Pallets desceram"
+          icon={Package}
         />
         <Card className="bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20 hover:shadow-glow transition-all duration-300">
           <CardHeader className="pb-3">
