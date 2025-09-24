@@ -95,3 +95,6 @@ TURNO 3	21/09/2025	0	1	0	131	190	22	11	0	Sem PNP	N/A	N/A	N/A	N/A	N/A	4	12 PALETE
 TURNO 1	22/09/2025	3	3	0	130	308	17	32	0	Sem PNP	N/A	N/A	N/A	N/A	N/A	5	06 Paletes para 10 itens reintegrados.						01 Carreta da janela de 16h, descarregada, 28 paletes compactados para 10 Posições liberadas.
 TURNO 2	22/09/2025	6	6	0	383	690	14	28	2	Sem PNP	N/A	N/A	N/A	N/A	N/A	4	0	5	0	0	Material em armazenamento Gr-Estojos	0	Material solicitado saldo na planilha  (757591 - 750165 - 51387-437052.00)
 TURNO 3	22/09/2025	0	0	0	207	286	28	24	0	Sem PNP	N/A	N/A	N/A	N/A	N/A	4	0	0	0	0	0	0	15 PALETES DE DESMOBILIZAÇÃO DO TRANS, ARMAZENADO NO ARMAZÉM.          30 PALETES DE COMPACTAÇÃO NO ARMAZÉM.
+TURNO 1	23/09/2025	5	2	3	136	350	32	41	0	Sem PNP	N/A	N/A	N/A	N/A	N/A	5	17 Paletes para 31 itens reintegrados.						58 Paletes compactados para 21 posições livres.
+TURNO 2	23/09/2025	6	6	0	610	332	15	28	0	Sem PNP	N/A	N/A	N/A	N/A	N/A	5	0	4	0	0	Material em armazenamento	0	Ajuste de material sem saldo E5 nova ordem não foi abastecida com material da ordem antiga no FIFO ( solicitou antecipação para 22:00 ) Paletes no paredão para armazenar.
+TURNO 3	23/09/2025	0	0	0	81	220	27	20	3	Sem PNP	N/A	N/A	N/A	N/A	N/A	4		0	0	0			. Carga de Dedutível com 26 paletes no piso :  Sistêmico em EXPEDE . Compactação de 21 paletes para 21 posições liberadas no armazém
