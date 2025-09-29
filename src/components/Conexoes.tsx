@@ -1,4 +1,4 @@
-import { ExternalLink, BarChart3, CheckCircle, TrendingUp, Building2 } from "lucide-react";
+import { ExternalLink, BarChart3, CheckCircle, TrendingUp, Building2, ActivityIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -13,7 +13,7 @@ const connectionItems = [
   },
   {
     title: "Tarefas e Recursos",
-    description: "Gestão integrada de atividades e alocação de recursos",
+    description: "Gestão integrada de atividades e recursos",
     url: "https://lookerstudio.google.com/u/0/reporting/27f01ce4-7d9d-4f31-9ec0-7db3d6fc6b4d/page/p_65j02zsgsd",
     icon: CheckCircle,
     gradient: "from-green-500 to-emerald-500",
@@ -26,7 +26,16 @@ const connectionItems = [
     icon: TrendingUp,
     gradient: "from-purple-500 to-pink-500",
     bgGradient: "from-purple-50 to-pink-50 dark:from-purple-950/50 dark:to-pink-950/50"
+  },
+  {
+    title: "Plano de ação",
+    description: "Análise técnica para a visualização do plano de ação",
+    url: "",
+    icon: ActivityIcon,
+    gradient: "from-red-500 to-yellow-500",
+    bgGradient: "from-red-50 to-yellow-50 dark:from-red-950/50 dark:to-yellow-950/50"
   }
+
 ];
 
 export const Conexoes = () => {
