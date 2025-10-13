@@ -790,14 +790,6 @@ export const Dashboard = () => {
                 gradient="accent"
                 className="col-span-1"
               />
-              <KPICard
-                title="Pallets Movimentados"
-                value={kpiArmazemEstojos.totalPalletsMovimentados}
-                subtitle="Movimentados"
-                icon={Activity}
-                gradient="primary"
-                className="col-span-1"
-              />
               <LinhasRodaramModal data={filteredArmazemEstojosData}>
                 <KPICard
                   title="Linhas que Rodaram"
@@ -829,7 +821,7 @@ export const Dashboard = () => {
                     <p className="text-sm font-medium text-foreground">{item.turno}</p>
                     <p className="text-xs text-muted-foreground">{formatBrazilianDate(item.dataHora)}</p>
                   </div>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
                     <div className="bg-gradient-to-br from-primary/20 to-accent/10 rounded p-3 text-center border border-primary/20">
                       <p className="text-xs text-muted-foreground font-semibold">Cargas Programadas</p>
                       <p className="text-lg font-bold text-foreground">{item.cargasProgramadas}</p>
@@ -844,11 +836,6 @@ export const Dashboard = () => {
                       <p className="text-xs text-muted-foreground font-semibold">Pallets Armazenados</p>
                       <p className="text-lg font-bold text-foreground">{item.palletsArmazenados}</p>
                       <p className="text-xs text-muted-foreground">armazenados</p>
-                    </div>
-                    <div className="bg-gradient-to-br from-primary/20 to-secondary/10 rounded p-3 text-center border border-primary/20">
-                      <p className="text-xs text-muted-foreground font-semibold">Pallets Movimentados</p>
-                      <p className="text-lg font-bold text-foreground">{item.palletsMovimentados}</p>
-                      <p className="text-xs text-muted-foreground">movimentados</p>
                     </div>
                   </div>
                 </div>

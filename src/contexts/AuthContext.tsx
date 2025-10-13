@@ -10,6 +10,13 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const ALLOWED_EMAILS = [
+  'enzo.tomas@grupoboticario.com.br',
+  'etiqlogba@grupoboticario.com.br',
+  'andersono@grupoboticario.com.br',
+  'lukas.rodrigues@grupoboticario.com.br',
+  'deleon@grupoboticario.com.br',
+  'juriti@grupoboticario.com.br',
+  'normaf@grupoboticario.com.br',
 ];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
