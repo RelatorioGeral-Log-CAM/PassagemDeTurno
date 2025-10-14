@@ -123,17 +123,19 @@ export const getKPISummaryMateriaPrima = (data: MateriaPrimaData[], selectedTurn
   let totalAgendadas = 0;
   let totalRecebidas = 0;
   
-  Object.values(dataGroups).forEach(dayData => {
-    if (dayData.length > 0) {
-      // Agendadas: apenas o primeiro valor do dia
-      const firstEntry = dayData[0];
-      totalAgendadas = parseInt(firstEntry.agendadas) || 0;
-      
-      // Recebidas: somar todos os turnos
-      totalRecebidas += dayData.reduce((acc, item) => 
-        acc + (parseInt(item.recebidas) || 0), 0);
-    }
-  });
+Object.values(dataGroups).forEach(dayData => {
+  if (dayData.length > 0) {
+    // Agendadas: somar todos os valores do dia
+    const agendadasDoDia = dayData.reduce((acc, item) =>
+      acc + (parseInt(item.agendadas) || 0), 0);
+
+    totalAgendadas += agendadasDoDia; // Agora está somando o total do dia ao total geral
+
+    // Recebidas: somar todos os turnos
+    totalRecebidas += dayData.reduce((acc, item) =>
+      acc + (parseInt(item.recebidas) || 0), 0);
+  }
+});
 
   const totalBacklog = filteredData.reduce((acc, item) => 
     acc + (parseInt(item.backLog) || 0), 0);
