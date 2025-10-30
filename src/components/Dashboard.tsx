@@ -811,6 +811,30 @@ export const Dashboard = () => {
             </div>
           </div>
 
+           {/* Tempo sem PNP por Fábrica - Armazém Estojos */}
+           <div className="mt-4 space-y-2">
+             <h4 className="text-sm font-medium text-muted-foreground">Tempo sem PNP:</h4>
+             <div className="grid grid-cols-1 gap-3">
+               <ArmazemEstojosPNPModal data={armazemEstojosData}>
+                 <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-800 transition-all hover:shadow-lg cursor-pointer">
+                   <div className="flex items-center space-x-2 mb-2">
+                     <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                     <p className="text-sm font-semibold text-purple-700 dark:text-purple-400">Fábrica de Estojos</p>
+                   </div>
+                   <p className="text-lg font-bold text-purple-600 dark:text-purple-400">{tempoSemPnpArmazemEstojos.status}</p>
+                   {tempoSemPnpArmazemEstojos.ultimoPnp && (
+                     <p className="text-xs text-purple-600 dark:text-purple-500 mt-1">
+                       Último PNP: {tempoSemPnpArmazemEstojos.ultimoPnp.toLocaleString('pt-BR')}
+                     </p>
+                   )}
+                   <p className="text-xs text-muted-foreground mt-2 opacity-70">
+                     Clique para ver histórico completo
+                   </p>
+                 </div>
+               </ArmazemEstojosPNPModal>
+             </div>
+           </div>
+
           {/* Detalhes por Turno - Armazém Estojos */}
           <div className="mt-6">
             <h4 className="text-sm font-medium text-muted-foreground mb-3">Detalhes por Turno:</h4>
@@ -840,30 +864,6 @@ export const Dashboard = () => {
                   </div>
                 </div>
               ))}
-             </div>
-           </div>
-
-           {/* Tempo sem PNP por Fábrica - Armazém Estojos */}
-           <div className="mt-4 space-y-2">
-             <h4 className="text-sm font-medium text-muted-foreground">Tempo sem PNP por Fábrica:</h4>
-             <div className="grid grid-cols-1 gap-3">
-               <ArmazemEstojosPNPModal data={armazemEstojosData}>
-                 <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-800 transition-all hover:shadow-lg cursor-pointer">
-                   <div className="flex items-center space-x-2 mb-2">
-                     <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                     <p className="text-sm font-semibold text-purple-700 dark:text-purple-400">Fábrica de Estojos</p>
-                   </div>
-                   <p className="text-lg font-bold text-purple-600 dark:text-purple-400">{tempoSemPnpArmazemEstojos.status}</p>
-                   {tempoSemPnpArmazemEstojos.ultimoPnp && (
-                     <p className="text-xs text-purple-600 dark:text-purple-500 mt-1">
-                       Último PNP: {tempoSemPnpArmazemEstojos.ultimoPnp.toLocaleString('pt-BR')}
-                     </p>
-                   )}
-                   <p className="text-xs text-muted-foreground mt-2 opacity-70">
-                     Clique para ver histórico completo
-                   </p>
-                 </div>
-               </ArmazemEstojosPNPModal>
              </div>
            </div>
          </div>
